@@ -1,0 +1,10 @@
+{
+  "commands": [
+    {
+      "name": "review",
+      "description": "Triggers the scientific reviewer skill on a target file",
+      "prompt": "Invoke the custom skill located at .claude/skills/SKILL.md. Analyze the provided file or context thoroughly using that exact persona."
+    }
+  ]
+}
+
