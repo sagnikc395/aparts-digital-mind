@@ -32,4 +32,4 @@ ScoreDescription1**Seriously flawed.** Methodology broken, results uninterpretab
 
 ScoreDescription1**Incomprehensible.** Cannot determine what the project is actually claiming or doing.2**Hard to follow.** Key information buried, missing, or diluted by excessive length. Significant effort to extract main points.3**Clear enough.** Can understand the problem, approach, and results without undue effort. Core content clearly present: problem, method, findings, limitations.4**Well presented.** Easy to follow, well-structured, appropriate level of detail. Target audience would get it quickly.5**Exceptionally clear.** A pleasure to read. Complex ideas made accessible. Could serve as a model for how to present this type of work.
 
-
+# After each review , write the review as format `REVIEW-<current_timestamp>.md` in the `reviews/` directory
