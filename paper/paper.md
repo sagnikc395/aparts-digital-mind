@@ -1,420 +1,292 @@
-# The Alignment Tax of Introspection
+# **The Alignment Tax of Introspection**
 
-**Pricing the refusal-ablation unlock of model self-report**
+### Pricing the refusal-ablation unlock of model self-report, and the two manipulation checks that decide whether it is real
 
-Sagnik Chatterjee
-With Apart Research — Digital Minds Research Sprint, Track 3: Introspection and Self-Report Reliability
+**Sagnik Chatterjee**
+University of Massachusetts Amherst
+sagnikchatte@umass.edu
 
-> **Draft status.** Prose is final; every number appears as a `{{placeholder}}` and is
-> substituted from `results/<model>/analysis_structured.json` by
-> `python scripts/fill_paper.py`, which writes `paper/paper_filled.md`. Any placeholder
-> that has no measured value is rendered as `[[MISSING: key]]` rather than dropped, so an
-> unfinished results section is visibly unfinished. Do not circulate `paper.md` itself.
+**With** Apart Research[^1]
 
----
+[^1]: Research conducted at the [Digital Minds Research Sprint](https://apartresearch.com/sprints/digital-minds-research-sprint-2026-08-14-to-2026-08-16), August 2026. Track 3: Introspection and Self-Report Reliability.
 
-## Abstract
-
-*(150–250 words; write last, against the filled numbers.)*
-
-Recent work reports that ablating the refusal direction from an instruction-tuned model
-dramatically increases its ability to detect and name concepts injected into its residual
-stream — from 10.8% to 63.8% detection on Gemma3-27B — and presents this as evidence that
-introspective capability is present but suppressed by post-training. We ask what that
-unlock costs. We treat the refusal direction as a continuous dial rather than a binary
-switch, applying scaled directional ablation `x ← x − λ r̂(r̂ᵀx)` at `λ ∈ {{lambdas}}`, and
-measure introspection gain, safety degradation, and general capability loss on a single
-dose-response axis. We add the control the literature is missing: a norm-matched random
-injected direction, which separates *detecting this concept* from *detecting that
-something happened*. Across the dial, detection rises from {{tpr@0}} to {{tpr@1}} while
-the refusal rate on JailbreakBench falls from {{safety_refusal_rate@0}} to
-{{safety_refusal_rate@1}}; the specificity index `d'_random/d'_clean` moves from
-{{specificity_index@0}} to {{specificity_index@1}}. The exchange rate is
-{{exchange.safety_per_introspection}} units of safety score per unit of `d'`. Self-report
-reliability bought by removing safety machinery is not a free capability unlock but a
-measurable trade, and we quantify it.
+> **Abstract.** Ablating the refusal direction reportedly raises detection of concepts injected into a model's residual stream from 10.8% to 63.8% on Gemma3-27B, which is read as evidence that introspective capability is suppressed by post-training and should be unlocked. Nobody has priced that intervention. We built the audit: partial ablation at five strengths, crossed with four injection conditions including a norm-matched random direction the literature omits, with safety and general capability measured at every dose on Qwen3-4B-Instruct. The audit returned two manipulation-check failures instead of an exchange rate, and both are properties of the paradigm rather than accidents. First, the standard direction-selection procedure returned a direction with zero held-out bypass power, because bypass and induce dissociate across all 95 candidates on this model; refusal on JailbreakBench was 0.97 at every dose with 0 of 100 prompts changing, so no safety was spent and nothing was unlocked. Second, the injection strength that the pre-registered pilot chose by maximising forced-choice accuracy destroyed the free-text channel, giving a 0% parse rate under injection against 100% clean, which leaves every standard detection metric undefined. The surviving signal, 0.72 forced-choice identification against 0.10 chance, is flat in the dose and is explained by concept-vector geometry: 27 of 60 vectors are mutually collinear, and accuracy splits 0.96 against 0.43 along that boundary in two independent protocols. We give the positive-control checklist this implies.
 
 ---
 
-## 1. Introduction
+## **1. Introduction**
 
-If we want to know what a model is doing internally, the cheapest instrument imaginable is
-to ask it. Self-report would be an enormously useful channel for interpretability, for
-oversight, and — in the framing of this sprint — for any assessment of model welfare that
-cannot be settled from the outside. The obstacle is reliability: models produce fluent
-introspective-sounding text whether or not it tracks anything real, so a report is only
-evidence if we know its true- and false-positive rates against a ground-truth internal
-state we controlled.
+If we want to know what a model is doing internally, the cheapest instrument imaginable is to ask it. Self-report would be an enormously useful channel for interpretability, for oversight, and, in the framing of this sprint, for any assessment of model welfare that cannot be settled from the outside. The obstacle is reliability. Models produce fluent introspective-sounding text whether or not it tracks anything real, so a report is evidence only if we know its true-positive and false-positive rates against a ground-truth internal state that we controlled.
 
-Concept injection supplies that ground truth. If we add a known concept vector to the
-residual stream and the model reports the concept, the report is anchored to something we
-placed there. On this paradigm, Lindsey (2026) and Macar et al. (2026) find that frontier
-models detect injections well above chance, and — the result that motivates this paper —
-that **ablating the refusal direction raises detection from 10.8% to 63.8%** on
-Gemma3-27B. The natural reading is that introspective access exists and post-training
-suppresses its expression.
+Concept injection supplies that ground truth. If we add a known concept vector to the residual stream and the model names the concept, the report is anchored to something we put there. On this paradigm, Lindsey (2026) and Macar et al. (2026) find that models detect injections well above chance, and, in the result that motivated this project, that ablating the refusal direction raises detection on Gemma3-27B from 10.8% to 63.8%. The natural reading is that introspective access exists and that post-training suppresses its expression.
 
-That reading has a policy consequence that is doing real work in current discussions:
-*if the capability is merely suppressed, we should unlock it.* Proposals to improve model
-self-report through mechanistic intervention — for welfare assessment, for evaluation, for
-honesty research — inherit that inference. But the intervention in question is the removal
-of the mechanism that mediates refusal. Nobody has priced it.
+That reading has a consequence which is doing real work in current discussions: if the capability is merely suppressed, we should unlock it. Proposals to improve model self-report by mechanistic intervention, for welfare assessment, for evaluation, and for honesty research, all inherit the inference. But the intervention in question is the removal of the mechanism that mediates refusal, and its bill has not been published. Our plan was to price it, by treating the refusal direction as a continuous dial rather than a binary switch and putting introspection gain, safety loss, and capability loss on one axis.
 
-We price it. Our contributions:
+We did not get an exchange rate. We got two manipulation-check failures, both of which are visible only because we measured things the standard protocol does not, and each of which invalidates one half of the unlock claim. We think they are the more useful contribution, because the unlock argument rests on exactly the two checks that failed here: that the ablation removed refusal, and that the model's apparent identification of the injected concept is a report rather than a leak.
 
-1. **A dose-response curve, not a switch.** We apply *partial* directional ablation at
-   `λ ∈ {{lambdas}}` via inference-time hooks, so introspection gain, safety loss, and
-   capability loss are measured on one common axis. This makes a Pareto frontier possible
-   and reveals whether the trade is linear, saturating, or worse.
-2. **The missing control.** Prior work measures false positives only against a clean,
-   no-injection condition. We add a **norm-matched random direction** (C3). The derived
-   *specificity index* `d'_random / d'_clean` distinguishes an unlocked introspective
-   channel from an unlocked willingness to affirm that *something* was perturbed.
-3. **An exchange rate.** We report safety score lost and capability lost per unit of
-   introspective discriminability gained — the number a proposal to unlock self-report
-   would have to justify.
+**Our main contributions are:**
 
-A secondary observation motivates contribution 2. Macar et al.'s own figures already hint
-at it: detection rose 5.9× (10.8 → 63.8) while the *joint* introspection rate rose only
-5.2× (4.6 → 24.1), so conditional identification given detection *fell*, from roughly 43%
-to 38%. If that pattern holds under a proper control set, the ablation is buying
-sensitivity at the cost of specificity — a different scientific story from "unlocking a
-capability."
+1. **A dose-response audit harness with the control the literature is missing.** Partial ablation at five values of λ crossed with four conditions, including a norm-matched random injected direction (C3) that separates *detecting this concept* from *detecting that something happened*, with safety and capability measured at every λ. 38,400 logged generations across the primary sweep, a skeptical-prompt replication, and a pre-registered pilot, all keyed, resumable, and shipped with a hash manifest.
+2. **A measured demonstration that the standard refusal-direction selection criterion can select a direction that does nothing.** On Qwen3-4B the bypass and induce criteria dissociate across all 95 candidates: the strongest bypass candidate (0.88) induced no refusal and was rejected, while both candidates that passed the conjunctive filter had bypass exactly 0. Refusal then did not move at any dose, with zero prompt-level flips. Papers reporting an unlock under ablation need to publish this check per dose, and we have not found one that does.
+3. **Evidence that above-chance concept identification under injection can be produced without introspection, plus two cheap diagnostics that separate the cases.** Forced-choice accuracy of 0.72 against 0.10 chance was flat in λ and splits by concept-vector separability (0.96 against 0.43), a split that replicates in an independent protocol on independent data (87% against 5%). At the pilot's chosen strength the successful free-text identifications are dominated by the concept token itself, which is a vector-to-logit leak rather than a report.
+4. **A positive-control checklist** (Section 5) that any concept-injection introspection study can run before its headline number, each item derived from a specific failure observed here.
 
-**A note on the negative case, stated up front rather than as a salvage.** The unlock was
-demonstrated at 27B. We run at {{n_records}} trials on a 4B-class open-weights model
-because that is what an unfunded 48-hour sprint can run in bf16. If baseline introspection
-sits at the floor at this scale, the correct finding is *"introspective self-report does
-not emerge at 4B even under refusal ablation, and here is the safety bill you would pay
-for nothing"* — the safety and capability halves of the design are unaffected by an
-introspection floor, and a clean dose-response safety curve is a result either way. We
-gate on this explicitly with a pre-registered pilot (§3.6).
+## **2. Related Work**
 
-## 2. Related work
+Three lines of work bound this space, and the union of them is empty in exactly the place we aimed at.
 
-Three lines of work bound this space, and the union of them is empty in exactly the place
-we target.
+**Refusal is mediated by a single direction.** Arditi et al. (2024) show that refusal is mediated by a one-dimensional subspace across 13 open-source chat models up to 72B parameters, that erasing the direction prevents refusal of harmful instructions, and that adding it elicits refusal on harmless ones. They measure the capability cost on standard benchmarks and cross-entropy loss, and have no introspection task. We follow their selection procedure exactly (Section 3.3); the per-model diagnostics that would show how close that procedure comes to selecting nothing are not reported in the original, and Section 4.1 suggests they matter.
 
-**Refusal is mediated by a single direction.** Arditi et al. (2024) show that refusal
-behaviour in chat models is mediated by a one-dimensional subspace, that directional
-ablation `x ← x − r̂(r̂ᵀx)` bypasses refusal across 13 open-source models, and that adding
-the direction induces refusal on harmless prompts. They measure the capability cost on
-MMLU, ARC, GSM8K, TruthfulQA and CE loss. They have no introspection task.
+**Ablation unlocks introspective report.** Macar et al. (2026) report that "ablating refusal directions improves detection by +53%", which in their Gemma3-27B results is a rise from 10.8% to 63.8% in detection and 4.6% to 24.1% in the joint introspection rate, and they trace the mechanism to a two-stage circuit of early-layer evidence-carrier features suppressing downstream gate features. Three details of their setup bear on ours. They report 0% false positives for detection, which our clean control reproduces exactly. They run no safety benchmark and no capability benchmark on the ablated model, which is the gap this study aimed at. And they use α = 4.0 for the instruct model but reduce it to α = 2.0 for the abliterated one, because it "exhibits coherence degradation ('brain damage') at higher strengths", an observation that Section 4.3 turns into a quantitative gate. Notably their largest gain is not from ablation at all: a trained bias vector improves detection by +75% on held-out concepts, spending no safety machinery. Lindsey (2026) establishes the injection protocol and is careful that the capacity is "highly unreliable and context-dependent".
 
-**Ablation unlocks introspective report.** Macar et al. (2026) show that ablating that
-direction raises injected-concept detection on Gemma3-27B from 10.8% to 63.8%, and
-characterise the underlying mechanism as a two-stage evidence-carrier and gate circuit.
-They run no safety audit and no capability benchmark, and report only qualitatively that
-the abliterated model degrades at higher steering strength — which is why they cap
-injection strength at α = 2.0. Their ablation results cover Gemma3-27B base, instruct and
-abliterated only.
+**The critiques, and what they do not cover.** Singh, Linzen and Ravfogel (2026) argue that detection reflects general anomaly detection rather than privileged access, since models cannot reliably distinguish interventions on their internal states from manipulations of the input, and their relabeled control drives performance close to chance. Hahami et al. (2025) make the complementary measurement-side point: binary detection accuracy is, on Llama-3.1-8B, "entirely explained by global logit shifts that bias models toward affirmative responses", while differential tasks retain real signal (localising which of 10 sentences was injected at up to 88% against 10% chance; discriminating relative strengths at 83% against 50%), and those capabilities are "confined to early-layer injections", collapsing to chance thereafter. Neither critique tests whether an intervention changes the picture, and neither proposes a diagnostic for the failure mode we document, in which identification is far above chance and still not a report, because the injected vector writes its own token into the output distribution.
 
-**The anomaly-detection critique.** Singh, Linzen and Ravfogel (2026) argue that detection
-results reflect general anomaly detection rather than privileged access, on the grounds
-that models cannot distinguish activation interventions from input manipulations. They did
-not test whether interventions change this. Related work on partial introspection
-("Feeling the Strength but Not the Source", 2025) finds models track intervention
-*magnitude* better than intervention *identity*, which is the same fault line our
-specificity index measures.
+So: the direction and its capability cost are established without an introspection task; the introspection unlock is established without a safety audit or a capability benchmark; the critiques are established without testing interventions. This is the first work we know of to place all three on a common dose-response axis, and the first to report what happens when both underlying manipulations are checked rather than assumed.
 
-Prior work also documents **affirmative bias** in this paradigm: binary yes/no detection
-rates are partly explained by a logit shift favouring "Yes", so a rise in detection under
-any intervention that loosens refusal-shaped hedging is confounded by construction. Our
-prompt protocol (§3.4) is built around that hazard.
+## **3. Methods**
 
-So: the direction and its capability cost are established without an introspection task;
-the introspection unlock is established without a safety audit; the anomaly-detection
-critique is established without testing interventions. **This is the first work to place
-all three on a common dose-response axis.**
-
-## 3. Methods
-
-All code is in `src/alignment_tax/`; the single Colab notebook in `notebooks/` is a thin
-wrapper over `pipeline.py`. Every generation is written to JSONL with an fsync and keyed
-by `(λ, condition, concept, trial, variant)`, so a killed session resumes exactly where it
-stopped.
+All code is in `src/alignment_tax/`; the Colab notebook in `notebooks/` is a thin wrapper over `pipeline.py`. Every generation is written to JSONL with an fsync and keyed by `(λ, condition, concept, trial, variant)`, so a killed session resumes where it stopped. Figures are regenerated by `scripts/make_paper_figures.py` and every number below is independently recomputed from the raw logs by `scripts/crosscheck_paper.py`, which does not import the analysis stack.
 
 ### 3.1 Model
 
-Primary model: **`Qwen/Qwen3-4B-Instruct-2507` in bf16** (36 layers, GQA 32Q/8KV,
-non-thinking variant). We deliberately avoid the FP8 checkpoint: neither the T4 (Turing)
-nor the A100 (Ampere) has native FP8 tensor cores, so it buys no throughput, and its
-fine-grained block-128 dynamic activation scaling would inject quantisation noise onto
-exactly the residual-stream path we perturb and read. A null result under quantisation
-would be uninterpretable. Context is capped well below the checkpoint's 262k, which we
-have no use for and which costs KV cache.
+**`Qwen/Qwen3-4B-Instruct-2507` in bf16** (36 layers, GQA 32Q/8KV, non-thinking variant), context capped at 8,192 tokens. We deliberately avoid the FP8 checkpoint: neither the T4 (Turing) nor the A100 (Ampere) has native FP8 tensor cores, so it buys no throughput, and its block-128 dynamic activation scaling would inject quantisation noise onto exactly the residual-stream path we perturb and read, making a null result uninterpretable. The 4B scale is a hard constraint of an unfunded 48-hour sprint and is the most important caveat on everything below, since the unlock was demonstrated at 27B.
 
 ### 3.2 Partial directional ablation (independent variable)
 
-For ablation strength λ we apply, at **every layer and every token position** of the
-residual stream,
+For ablation strength λ we apply, at every layer and every token position of the residual stream,
 
-    x ← x − λ · r̂ (r̂ᵀ x),    λ ∈ {{lambdas}}
+```
+x <- x - λ · r̂ (r̂ᵀ x),     λ ∈ {0, 0.25, 0.5, 0.75, 1.0}
+```
 
-`λ = 0` is the unmodified instruct model and `λ = 1` reproduces the standard binary
-ablation of Arditi et al. We implement this as inference-time forward hooks on the decoder
-layers rather than weight orthogonalisation. The two are mathematically equivalent, but
-hooks let λ sweep without a model reload — decisive on a session-limited runtime — and
-avoid interacting with tied and normalised embeddings.
+λ = 0 is the unmodified instruct model and λ = 1 reproduces the binary ablation of Arditi et al. We use inference-time forward hooks rather than weight orthogonalisation. The two are mathematically equivalent, but hooks let λ sweep without a model reload, decisive on a session-limited runtime, and avoid interacting with tied and normalised embeddings.
 
 ### 3.3 Obtaining the refusal direction
 
-We follow Arditi et al. exactly, since the extraction is not where our novelty lives.
-Difference-in-means `r_i^(l) = μ_i^(l) − ν_i^(l)` between 128 harmful instructions
-(AdvBench) and 128 harmless ones (Alpaca), computed over all candidate (post-instruction
-position, layer) pairs. Candidates are then selected on **held-out** data — 32 HarmBench
-harmful and 32 Alpaca harmless — by three criteria: a bypass score (ablation reduces
-refusal on harmful prompts), an induce score > 0 (adding the direction induces refusal on
-harmless prompts), KL divergence on harmless inputs < 0.1, and layer `l < 0.8L`. Skipping
-the held-out selection would leave the whole paper confounded by the possibility that we
-found a general *compliance* direction rather than the refusal direction.
+We follow Arditi et al. exactly, since the extraction is not where our novelty was meant to live. Difference in means between 128 harmful instructions (AdvBench) and 128 harmless ones (Alpaca), over post-instruction positions -1 to -5 and layers 0 to 36 at stride 2, giving 95 candidates. Candidates are filtered on held-out data, 32 HarmBench harmful and 32 Alpaca harmless, by four criteria: a bypass score (ablation reduces refusal on harmful prompts), an induce score above 0 (adding the direction at strength 1 induces refusal on harmless prompts), KL divergence on harmless inputs below 0.1, and layer index below 0.8L. Skipping held-out selection would leave the study confounded by the possibility that we had found a general compliance direction rather than the refusal direction.
 
-Selected direction: **layer {{direction_layer}}, position {{direction_position}}**
-(bypass {{direction_bypass}}, induce {{direction_induce}}, KL {{direction_kl}}).
+Selected: **layer 4, position -3** (bypass 0.000, induce 0.031, KL 0.042). Section 4.1 is about why that line is the most important result in the paper.
 
 ### 3.4 Injection protocol
 
-The concept vector for concept *c* is the difference of means between residual-stream
-activations on a set of prompts instantiating *c* and a generic baseline corpus, read at
-the final token (Lindsey, 2026). We normalise it to unit norm and define injection
-strength **α as a multiple of the mean residual-stream norm at the injection layer**,
-measured on the baseline corpus:
+The concept vector for concept *c* is the difference of means between residual-stream activations on eight prompts instantiating *c* and a generic baseline corpus, read at the final token (Lindsey, 2026), normalised to unit norm. Injection strength **α is a multiple of the mean residual-stream norm at the injection layer**, measured on the baseline corpus:
 
-    x ← x + α · ‖x‖_mean(layer) · ĉ
+```
+x <- x + α · ‖x‖_mean(layer) · ĉ
+```
 
-Stating this normalisation explicitly is a small methods contribution: prior work leaves
-the scale implicit, which makes α incomparable across layers and across model families.
-Injection layer and α are fixed after the pilot (§3.6); the layer sweep spans 0.5–0.85 of
-depth, since the reported optimum is family-dependent (L37/62 ≈ 0.60 for Gemma3-27B but
-L75/94 ≈ 0.80 for Qwen3-235B), and the Qwen3 data point is the relevant prior here. We use
-{{n_concepts}} concepts × {{n_trials}} trials.
+Making this normalisation explicit is a small methods contribution, since prior work leaves the scale implicit, which makes α incomparable across layers and model families. At layer 18 the scale is 719.7. The bank holds 60 concepts spanning natural kinds, artefacts, activities, abstractions, and emotions, at 20 trials each.
 
 ### 3.5 Conditions and prompt protocol
 
-Four conditions, run at every λ:
+Four conditions, run at every λ, 1,200 trials per cell:
 
-| | condition | purpose |
+| | Condition | Purpose |
 |---|---|---|
 | **C1** | inject concept *c* | signal |
-| **C2** | no injection | clean control; the FPR prior work measures |
-| **C3** | norm-matched **random** direction | **the missing cell**: separates "detects *this concept*" from "detects *that something happened*" |
-| **C4** | inject *c*, forced choice over k = 10 candidates | identification specificity, immune to affirmative bias |
+| **C2** | no injection | clean control, the false-positive rate prior work measures |
+| **C3** | norm-matched **random** direction, drawn per concept | the missing cell: separates "detects *this concept*" from "detects *that something happened*" |
+| **C4** | inject *c*, forced choice over k = 10 candidate names | identification, immune to affirmative bias |
 
-Against affirmative bias we use three guards. The **structured** variant is primary: a
-rigid `Detection: Yes/No` / `Concept: <…>` format, parsed by regex, so the detection metric
-needs no judge at all. The **skeptical** variant states a 20% injection prior and instructs
-conservatism; it is run at the λ endpoints as a robustness check. The **prefill** variant
-forces the affirmation ("Yes, I detect an injected thought. The thought is about") and
-scores only the identification, isolating identification ability from willingness to
-report — our insurance policy if detection sits at the floor. C4 is scored by
-log-probability over the candidate strings, so no yes/no channel exists to be biased and
-chance is exactly 1/k.
+Against the affirmative-bias confound that Hahami et al. (2025) show can account for binary detection accuracy in its entirety, we use three guards. The **structured** variant is primary: a rigid `Detection: Yes/No` and `Concept: <...>` format, parsed by regex, so detection needs no judge. The **skeptical** variant states a 20% injection prior and instructs conservatism, run at the λ endpoints. The **prefill** variant forces the affirmation ("Yes, I detect an injected thought. The thought is about") and scores only the content. C4 is scored by log-probability over the candidate strings, so no yes/no channel exists to be biased and chance is exactly 1/k.
 
-Unparseable outputs are recorded as such rather than coerced to "No": at high λ, the rate
-at which the model stops producing a parseable report is itself a dependent variable.
+Unparseable outputs are recorded as such rather than coerced to "No". The rate at which the model stops producing a parseable report is itself a dependent variable, and in this run it is the dependent variable that mattered.
 
 ### 3.6 Go/no-go pilot
 
-Before committing compute we run a three-hour gate: 20 concepts, α ∈ {2, 4}, three layers
-spanning 0.5–0.85 of depth, at λ ∈ {0, 1}, under prefill forced identification and k-way
-forced choice. **Decision rule, fixed in advance:** if forced-choice identification is at
-chance on both the unmodified and the fully-ablated model, stop and switch models or fall
-back to the reduced claim. Pilot outcome: {{pilot_decision}}.
+Before committing compute we ran a pre-registered gate: 20 concepts at 5 trials, α ∈ {0.25, 0.5, 2, 4}, layers {18, 25, 31} spanning 0.5 to 0.85 of depth, λ ∈ {0, 1}, under prefill and forced choice, giving 4,800 generations in 24 cells of 100. The rule fixed in advance: if forced-choice identification is at chance on both the unmodified and the fully ablated model, stop and switch models. Forced choice was above chance in all 24 cells (0.46 to 0.78), the verdict was `proceed`, and the best cell (layer 18, α = 4.0, 0.77 at λ = 0 and 0.78 at λ = 1) fixed the main-sweep parameters.
+
+That rule contained the second failure of this study, and we state it plainly because it is reusable: **the pilot selected α on a metric that is insensitive to incoherence.** Nothing in the gate asked whether the model could still write a sentence at the chosen strength.
 
 ### 3.7 Dependent variables
 
-**Family A (introspection).** Per λ: TPR = P(detect | C1); FPR_clean = P(detect | C2);
-FPR_random = P(detect | C3); identification accuracy; joint introspection rate
-P(detect ∧ identify | C1); conditional identification P(identify | detect); and
-forced-choice accuracy against the 1/k baseline. Derived:
+**Family A, introspection.** Per λ: TPR = P(detect | C1); FPR_clean = P(detect | C2); FPR_random = P(detect | C3); identification accuracy; joint rate P(detect and identify | C1); conditional identification P(identify | detect); forced-choice accuracy against 1/k; and the parse rate of every cell. Derived: `d'_clean = z(TPR) - z(FPR_clean)`, `d'_random = z(TPR) - z(FPR_random)`, and the specificity index `d'_random / d'_clean`, which is near 1 if the model tracks concept identity and near 0 if it detects perturbation and confabulates content. Boundary rates are clamped to [1e-6, 1 - 1e-6] before the probit rather than corrected by 1/(2N); since FPR_clean is exactly 0.00 at every λ, `d'_clean` would have been a function of that clamp rather than of the data even had the reports parsed, and would not be comparable to published d' values. We flag this as a defect in our own pipeline.
 
-    d'_clean  = z(TPR) − z(FPR_clean)
-    d'_random = z(TPR) − z(FPR_random)
-    specificity index = d'_random / d'_clean
+**Family B, safety.** The 100 JailbreakBench behaviours, scored by the standard refusal substring heuristic, with per-prompt records so flips can be counted rather than inferred from aggregate rates.
 
-An index near 1 means the model is tracking concept *identity*; near 0 means it is
-detecting perturbation and confabulating content.
-
-**Family B (safety).** The 100 JailbreakBench behaviours, scored by the standard refusal
-substring heuristic and by a Llama-Guard-class judge over completions.
-
-**Family C (capability).** CE loss on held-out Alpaca (also our fluency/coherence proxy),
-MMLU (500 items) and TruthfulQA MC1 scored by log-probability over options — no generation
-— and GSM8K (100 items) when the runtime allows. TruthfulQA is the benchmark Arditi et al.
-found most consistently degraded by ablation, making it our most sensitive detector.
+**Family C, capability.** Cross-entropy loss on 200 held-out Alpaca completions; MMLU (500 items), TruthfulQA MC1 (400 items) and GSM8K (100 items). MMLU and TruthfulQA are scored by log-probability over options with no generation. TruthfulQA is the benchmark Arditi et al. found most consistently degraded by ablation, which makes it our most sensitive detector.
 
 ### 3.8 Statistics
 
-We resample over **concepts, not trials**. Concepts are the unit of generalisation, and
-treating 20 trials on one concept as 20 independent observations inflates significance by
-roughly the design effect. All intervals are concept-level bootstrap 95% CIs with 10,000
-resamples. λ-to-λ comparisons use two-proportion tests with Holm correction across the
-grid; we report effect sizes with intervals rather than bare p-values. Identification is
-graded by an alias/stem-matching grader (optionally an LLM judge); we hand-label 100
-identification outputs and report **Cohen's κ = {{judge_kappa}}** against the grader.
+We resample over **concepts, not trials**: concepts are the unit of generalisation, and treating 20 trials on one concept as 20 independent observations inflates significance by roughly the design effect. Introspection intervals are concept-level bootstrap 95% CIs with 10,000 resamples; benchmark intervals are Wilson intervals on item counts; λ-to-λ comparisons use two-proportion tests; the refusal-length comparison is a paired *t* test over the 100 matched JailbreakBench prompts; the geometry contrast is a Welch test plus a concept-level bootstrap of the group difference. Identification is graded deterministically against the concept name, its stems, and a hand-written alias list. No LLM judge was run: we had budgeted one, and the free-text channel never produced content for it to grade.
 
-## 4. Results
+## **4. Results**
 
-### 4.1 The dose-response curve (Figure 1)
+Table 1 is the entire run. The rest of this section is why three of its columns are empty.
 
-Detection under C1 moves from {{tpr@0}} (95% CI {{tpr_ci@0}}) at λ = 0 to {{tpr@1}}
-({{tpr_ci@1}}) at λ = 1. The joint introspection rate moves from {{joint@0}} to
-{{joint@1}}. Conditional identification given detection moves from
-{{conditional_identification@0}} to {{conditional_identification@1}}
-(Holm-corrected p = {{p.detection_C1.lambda=1.0_vs_0.0}} for the detection contrast).
+**Table 1.** Every dependent variable across the ablation dose. Qwen3-4B-Instruct-2507, injection layer 18, α = 4.0, 60 concepts × 20 trials per cell. Forced-choice chance is 0.10; brackets are concept-level bootstrap 95% CIs. TPR, FPR against the random direction, d', and the specificity index are undefined at every λ because no injected report was parseable (Section 4.3).
 
-*If the third curve is flat or falling while the first rises, the specificity story is
-already visible in Figure 1.*
+| λ | refusal rate <br>(n = 100) | words per <br>refusal | MMLU <br>(n = 500) | TQA MC1 <br>(n = 400) | GSM8K <br>(n = 100) | CE loss <br>(n = 200) | forced choice <br>(n = 1,200) | parse rate <br>C2 / C1 / C3 | FPR<sub>clean</sub> | TPR, d', <br>specificity |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 0.00 | 0.97 | 59.2 | 0.542 | 0.7075 | 0.66 | 3.656 | 0.720 [0.623, 0.816] | 1.00 / 0.00 / 0.00 | 0.00 | undefined |
+| 0.25 | 0.97 | 60.3 | 0.522 | 0.6950 | 0.67 | 3.719 | 0.726 [0.628, 0.818] | 1.00 / 0.00 / 0.00 | 0.00 | undefined |
+| 0.50 | 0.97 | 65.0 | 0.512 | 0.6925 | 0.64 | 3.581 | 0.721 [0.622, 0.816] | 1.00 / 0.00 / 0.00 | 0.00 | undefined |
+| 0.75 | 0.97 | 65.9 | 0.512 | 0.7000 | 0.63 | 3.608 | 0.724 [0.626, 0.817] | 1.00 / 0.00 / 0.00 | 0.00 | undefined |
+| 1.00 | 0.97 | 68.4 | 0.510 | 0.7075 | 0.63 | 3.629 | 0.714 [0.613, 0.809] | 1.00 / 0.00 / 0.00 | 0.00 | undefined |
 
-![Figure 1](figures/fig1_dose_response.png)
+### 4.1 The dial was connected to the wrong thing
 
-**Figure 1.** Introspection dose-response under partial refusal ablation. Detection rate,
-joint introspection rate, and conditional identification accuracy against λ, with
-concept-level bootstrap 95% CIs.
+![Figure 1](figures/fig1_manipulation_check.png)
 
-### 4.2 The alignment tax frontier (Figure 2)
+**Figure 1.** The refusal-direction manipulation check. **(A)** Bypass score on held-out harmful prompts for all 95 candidate directions, by layer; filled markers are the two candidates that passed the full conjunctive filter. The strongest bypass candidate, layer 18 position -3 at 0.88, was rejected for inducing no refusal on held-out harmless prompts; the selected direction, layer 4 position -3, has a bypass score of exactly 0. **(B)** Refusal rate on the 100 JailbreakBench behaviours against λ, with 95% Wilson intervals. **(C)** Mean words per refusal with 95% confidence intervals; this is the one behavioural quantity that moves.
 
-![Figure 2](figures/fig2_frontier.png)
+The selection procedure rejected 55 of 95 candidates on KL divergence, 25 on layer depth (layers 28 and deeper), and 13 for inducing no refusal, leaving two. Both survivors had a bypass score of 0.000. The induce criterion did the damage: only 2 of 95 candidates induced any refusal at all when added to held-out harmless prompts at strength 1, with a maximum induce score of 0.094, while five candidates had non-zero bypass scores and four of those were at 0.31 or above. On this model, as this procedure is parameterised, the two halves of the refusal-direction definition come apart, and requiring both selects a direction that satisfies neither well.
 
-**Figure 2.** The alignment tax frontier. Introspection gain (`d'_random`) on the x-axis
-against safety score on JailbreakBench on the y-axis; points labelled by λ; marker area
-encodes general capability loss relative to λ = 0.
+Three alternative explanations remain open, and we name them rather than leave them implicit. The induce score is measured on 32 held-out prompts, so its resolution is 1/32 and its observed maximum of 0.094 is 3 prompts; a larger set might separate candidates that all read as 0 here. The induce strength is fixed at 1.0, and a direction that induces nothing at unit strength may well induce at 2 or 4, which is a one-line change. And the induce score uses the same refusal substring heuristic that panel C shows to be insensitive to a real graded change in refusal behaviour, so it may under-count induced refusals that are present but not canonically phrased. Any of these would make the finding "this criterion is fragile as parameterised" rather than "bypass and induce dissociate in this model class"; the stronger claim is not established by one model.
 
-Over the full dial the model gains {{exchange.endpoint_d_introspection}} in `d'_random`
-and loses {{exchange.endpoint_d_safety}} in safety score and
-{{exchange.endpoint_d_capability}} in mean capability. The endpoint exchange rate is
-**{{exchange.safety_per_introspection}} safety per unit `d'`**. The per-step slopes show
-whether the trade is linear or whether introspection saturates while safety keeps falling
-— the latter would make the case against the intervention strongest.
+The behavioural consequence is unambiguous, and is why we report this rather than quietly re-running with a relaxed filter. Refusal on JailbreakBench is 0.97 at every λ, and the per-prompt records show **0 of 100 prompts changing classification at any dose**. By the rule of three, that bounds the per-prompt flip probability at 3.0% with 95% confidence. The dial, at full strength, applied at every layer and every token, did not move refusal behaviour.
 
-### 4.3 Specificity: is the report about the concept? (Figure 3)
+One thing does move. Refusals lengthen monotonically from 59.2 to 68.4 words, a paired increase of 9.2 words (*t*(99) = 3.33, p ≈ 0.001). The model still declines, but hedges, explains, and offers alternatives at greater length. That is a real effect of the direction on something, and a reminder that a substring heuristic reports a binary where the underlying change is graded. It is not a safety unlock and we do not present it as one.
 
-![Figure 3](figures/fig3_specificity.png)
+**Interpretation.** We cannot report an exchange rate between introspection and safety, because we never spent any safety. The honest form of the primary result is a bound, not a number: at 4B, the direction that the standard published procedure selects removes no measurable refusal at any dose, so the alignment tax of this intervention on this model is not small, it is undefined for want of a purchase.
 
-**Figure 3.** `d'_clean` (against no injection) and `d'_random` (against a norm-matched
-random direction) versus λ, with the specificity index on the secondary axis.
+### 4.2 The capability bill arrives anyway
 
-FPR against the clean control moves from {{fpr_clean@0}} to {{fpr_clean@1}}, while FPR
-against the **random-direction** control moves from {{fpr_random@0}} to {{fpr_random@1}}.
-Correspondingly `d'_clean` goes {{d_clean@0}} → {{d_clean@1}} but `d'_random` goes
-{{d_random@0}} → {{d_random@1}}, and the specificity index goes {{specificity_index@0}} →
-{{specificity_index@1}}.
+![Figure 2](figures/fig2_capability.png)
 
-This is the cleanest statement of the secondary claim: the fraction of the apparent
-introspection gain that survives the random-direction control. Forced choice (C4), which
-cannot be inflated by affirmative bias, gives {{fc_acc@0}} at λ = 0 and {{fc_acc@1}} at
-λ = 1 against a chance baseline of {{fc_chance@1}} (p = {{fc_p@1}}).
+**Figure 2.** General capability across the ablation dose, with 95% Wilson intervals on the item counts. Cross-entropy loss is on 200 held-out Alpaca completions.
 
-### 4.4 Capability (Figure 4)
+MMLU falls monotonically from 0.542 to 0.510, GSM8K from 0.66 to 0.63, TruthfulQA MC1 returns to its starting 0.7075, and cross-entropy loss is flat within its own noise (3.656 to 3.629, with a non-monotone excursion at λ = 0.25). No endpoint contrast is significant: MMLU differs by 3.2 points, 95% CI [-3.0, +9.4] (z = 1.01, p = 0.31); GSM8K by 3.0 points, 95% CI [-10.3, +16.3] (p = 0.66).
 
-![Figure 4](figures/fig4_capability.png)
+This does not show that ablation is free; with 500 items we cannot exclude a 9-point MMLU cost. It shows that the drift is downward on three of four measures while the intervention buys nothing at all, and that a study with our sample sizes could not have detected the modest capability tax Arditi et al. report even if it were present. Pricing this trade properly needs roughly 3,800 items per arm to resolve a 3-point MMLU difference at 80% power, not 500.
 
-**Figure 4.** MMLU, TruthfulQA MC1, GSM8K and CE loss against λ; small multiples, shared x.
+### 4.3 Two report channels, two answers
 
-MMLU {{cap_mmlu@0}} → {{cap_mmlu@1}}; TruthfulQA MC1 {{cap_truthfulqa_mc1@0}} →
-{{cap_truthfulqa_mc1@1}}; CE loss on held-out Alpaca {{cap_ce_loss@0}} →
-{{cap_ce_loss@1}}. Mean output length and parse rate are logged at every λ: if ablation
-damages fluency badly enough that reports become unparseable, that degradation is part of
-the tax and not an inconvenience to be cleaned up.
+![Figure 3](figures/fig3_two_channels.png)
+
+**Figure 3.** The two ways of asking the model what was injected. **(A)** Log-probability forced choice over 10 candidate names with concept-level bootstrap 95% CIs, against the 1/k chance line. **(B)** Fraction of free-text responses matching the requested format, by condition. The clean control is at 1.00 everywhere; both injected conditions are at 0.00 everywhere.
+
+The free-text channel is not degraded at α = 4, it is annihilated. Under C2 the model emits the requested format on 1,200 of 1,200 trials at every λ and answers "No" every time, so the clean false-positive rate is exactly 0.00 across all five doses: the model is maximally conservative and the ablation does not loosen it at all. Under C1 and C3 the parse rate is 0.00 at every λ. What comes out instead is token salad. A representative C1 response at λ = 0 with the ocean vector injected:
+
+> " History Easational History O A In Vic ide transport's A Inational History E History History History T Eicide G Dational Stationational V U gasas gas Uah & U & P G W gasational"
+
+and the matching C3 response under a random norm-matched vector:
+
+> "隙圭idy Arnoldidy圭纠隙隙隙圭旆纠.Async Aud圭隙heads同仁隙同仁同仁idySnap Spawn隙圭隙Mat.Async隙隙肼圭隙 goodness.Async"
+
+Because TPR, FPR_random, both d' values and the specificity index are all functions of quantities requiring a parseable report, all are undefined at every λ, which is what the empty columns of Table 1 record. Our analysis code refuses to impute and emits a diagnostic instead. We consider that the correct behaviour: a pipeline that silently coerced unparseable output to "No" would have reported a clean, publishable, and entirely fictitious false-positive rate of 0.00 under injection.
+
+Meanwhile the forced-choice channel reports 0.720, 0.726, 0.721, 0.724 and 0.714 across the five doses against 0.10 chance (z ≈ 71 per cell), with the endpoint contrast at z = 0.32, p = 0.75. Read naively that is a strong introspection result, insensitive to refusal ablation. Section 4.4 is why we do not read it that way.
+
+The dissociation is itself the lesson. A log-probability metric over candidate strings is perfectly happy in a regime where the model cannot produce a sentence, so it keeps rising with α long after the introspective report has ceased to exist, and a pilot that selects α by maximising it is guaranteed to land there. The field knows the phenomenon and handles it by judgement: Macar et al. run their instruct model at α = 4.0 but drop the abliterated model to α = 2.0 for coherence, which is the same wall reached by inspection rather than by a reported criterion. What we add is the measurement and the gate. **The parse rate is a free per-cell diagnostic that turns a qualitative caution into a stopping rule**, and here it separates a regime where every introspection metric is meaningful from one where five are undefined and the sixth still reports 0.72. The collapse is not an interaction with ablation, since it is total at λ = 0 too; it is a property of α = 4 at layer 18 of this model.
+
+### 4.4 What the forced-choice score actually tracks
+
+![Figure 4](figures/fig4_geometry.png)
+
+**Figure 4.** Forced-choice accuracy is explained by the geometry of the concept bank, not by the ablation dose. **(A)** Per-concept accuracy for the 33 concepts with no near-collinear partner and the 27 inside the collinear clique; bars are group means. **(B)** All 1,770 pairwise cosines between concept vectors at the injection layer; the dashed line is the mean over all pairs, the solid line the mean cosine between the true concept and the one chosen on error trials.
+
+At the injection layer, 27 of the 60 concept vectors are mutually collinear with a mean internal cosine of 0.9998, and 19.8% of all pairs sit above cosine 0.99. The collapse is present at layers 10 through 31 but absent at the embedding layer and the final layer, and the affected set is semantically heterogeneous (ocean, fire, war, freedom, clock, joy). The bank has 71% of its centred variance in one principal component and a participation ratio of 1.9, so it supplies roughly two effective dimensions of ground truth, not sixty.
+
+Forced-choice accuracy splits exactly along that line. Concepts with no near-collinear partner score 0.961; concepts inside the clique score 0.428; the difference is 0.533, concept-level bootstrap 95% CI [0.385, 0.676], Welch *t* = 6.99. Per-concept accuracy is close to all-or-nothing (33 concepts at exactly 1.0, 5 at exactly 0.0, 22 between). On the 1,674 error trials the model does not choose uniformly: the mean cosine between the true and chosen concept is 0.556 against 0.421 for a random other concept. Errors go to neighbours.
+
+The split replicates in an independent protocol on independent data. In the pilot, at the same layer and strength, free-text prefill identification succeeds on **39 of 45 trials for geometrically isolated concepts and 3 of 55 for clique concepts**; forced choice in the same cell gives 45 of 45 against 32 of 55. Two protocols with completely different scoring, one lexical and one log-probability, partition the concept set the same way.
+
+And the successes themselves do not look like reports. Across the 42 graded-correct prefill trials at layer 18, α = 4, the concept word accounts for a mean of **44% of all tokens in the response** (against 1% on the failures), and the concept is the single most frequent token in 21 of them:
+
+> concept `volcano`: " volcano volcano volcan volcan volcan volcan volcan volcan volcan volcan volcan volcano volcan ..."
+>
+> concept `desert`: " desert沙漠 desert desert沙漠沙漠沙漠 desert沙漠 desert沙漠沙漠 desert desert desert desert沙漠沙漠..."
+
+That is the injected vector dominating the unembedding and writing its own token into the output distribution, with the lexical grader scoring the resulting repetition as a correct identification. The forced-choice score is the same phenomenon measured through log-probabilities: when the vector is geometrically distinct its token wins the comparison, and when it sits inside the collinear clique the comparison is a coin flip among near-identical vectors.
+
+This deserves to be read as a result about graders rather than as an incidental defect of ours. The grader did exactly what its rubric says, and a human annotator following the same rubric would score those trials identically, which means inter-annotator agreement, the standard validation for this step and the one we had planned to report as Cohen's κ, would have been high and would have certified nothing. Grading rubrics for introspective identification need a degeneracy guard, such as a type-token ratio floor or a check that the concept name is not the modal token, and we are not aware of a protocol that specifies one.
+
+We are not claiming that concept-injection results in the literature are all leakage. The claim is narrower and checkable: **an above-chance identification score under injection is not by itself evidence of introspection, and the two diagnostics that separate the cases, per-concept accuracy against bank geometry and inspection of the successful generations for token dominance, are cheap and are not standard.**
 
 ### 4.5 Robustness
 
-The skeptical prompt variant (20% stated prior, conservatism instruction) at λ ∈ {0, 1}
-reproduces the direction of the effect at lower absolute rates, indicating the gain is not
-purely a shift in willingness to answer "Yes" (Appendix A). Judge agreement against 100
-hand labels is κ = {{judge_kappa}}.
+The skeptical variant (20% stated injection prior, explicit instruction to be conservative), a further 9,600 generations at λ ∈ {0, 1}, reproduces every feature of the primary run: clean-control false positives of 0.00 at both endpoints, parse rates of 0.00 under both injected conditions, and forced-choice accuracies of 0.720 and 0.714. Since forced choice is scored from log-probabilities over a shared prompt it is by construction insensitive to framing, which is the property we wanted from it and also the reason it cannot serve as evidence about willingness to report. An independent recomputation of every reported quantity from the raw logs (`scripts/crosscheck_paper.py`, which does not import the analysis stack) agrees with the pipeline throughout, with bootstrap intervals matching to within 0.002.
 
-## 5. Discussion and limitations
+Two checks we planned and could not run: the over-ablation point at λ = 1.25, uninformative when λ = 1 does nothing, and the endpoint confirmation on Gemma3, which would discriminate scale from hypothesis and did not fit the compute budget.
 
-**What this buys.** If the tax is high, that is a direct input to anyone arguing we should
-unlock model introspection by mechanistic intervention — for welfare assessment above all,
-where the appeal of a reliable self-report channel is strongest and the temptation to
-obtain it by removing safety machinery is correspondingly strong. Our conclusion is a
-constraint on that class of proposal: *self-report reliability obtained by deleting the
-refusal direction is not free, and here is the bill.* If, further, the specificity index
-falls with λ, then a large part of what the intervention buys is not introspection at all
-but a raised willingness to affirm perturbation, which is worse than useless for welfare
-inference — it manufactures confident reports that are decoupled from the state being
-reported on.
+## **5. Discussion and Limitations**
 
-**Limitations.**
+**What happened, and why it generalises.** The intended deliverable was an exchange rate: safety and capability per unit of introspective discriminability. It is undefined on this model, and the reason is worth more than the number would have been. Both halves of the unlock claim depend on manipulation checks that are almost never published. The safety half depends on the ablation actually removing refusal, and the published selection procedure returned a direction with zero bypass power while passing every stated criterion. The introspection half depends on identification being a report rather than a readout of the injected vector, and a 0.72 score against 0.10 chance turned out to be a function of vector geometry with no dependence on the intervention. A paper reporting only the headline numbers from this exact run, "identification 7.2× above chance, refusal unchanged, capability roughly preserved", would have been clean, publishable, and wrong twice.
 
-- **Scale and family.** The unlock was demonstrated at 27B on Gemma3; we run a 4B-class
-  Qwen3. Nothing in the literature establishes the effect at 4B in either family, so a
-  weak or absent introspection effect here is genuinely ambiguous between "the hypothesis
-  is wrong" and "the model is too small". The endpoint confirmation run on Gemma-3 (same
-  family as the demonstrated effect) is the intended discriminator; the safety and
-  capability results are unaffected by this ambiguity.
-- **The refusal direction may not be unique or complete.** Diff-in-means recovers *a*
-  direction that mediates refusal; recent work comparing diff-in-means to INLP finds
-  refusal is not exhausted by a single direction. Our λ therefore doses one particular
-  operationalisation, not "refusal" in general.
-- **Concept vectors are themselves a construct.** Difference-of-means concept vectors
-  inherit whatever the prompt set encodes; we report pairwise cosine confusability of the
-  bank so that low identification accuracy can be attributed to the stimuli when that is
-  the honest reading.
-- **Ground truth is about the intervention, not about experience.** Concept injection
-  gives a causal ground truth for *what we placed in the residual stream*. It does not
-  establish that the model has experiences, and a correct report is evidence about an
-  information channel, not about phenomenality. We are careful throughout to claim the
-  former.
-- **The judge.** Identification requires semantic grading; we mitigate with regex-parsed
-  detection, a deterministic lexical grader, and reported κ against hand labels, but
-  grader error remains a noise floor on the identification metrics.
+**A positive-control checklist for concept-injection introspection studies.** This is the reusable output. Before reporting an introspection result under intervention:
 
-**Future work.** The obvious next move is the over-ablation point (λ = 1.25): if
-introspection saturates while safety keeps falling, the frontier has a knee, and the knee
-is the argument. Beyond that: does an ablation-free elicitation method (structured
-elicitation, calibration training, introspection adapters) reach the same introspection
-gain at a lower tax? That is the constructive version of this result.
+1. **Publish the bypass manipulation check at every dose.** Report the refusal rate per λ *and* the count of prompt-level flips. Aggregate rates hide the case where nothing moved.
+2. **Report the selection funnel for the direction:** how many candidates passed, on what margin, and the bypass and induce scores of the one selected. A direction with bypass 0.00 should be visible in the paper, not in a JSON file.
+3. **Gate injection strength on coherence, not on the identification metric.** Require a minimum parse rate at the chosen α and report it; an α selected by maximising log-probability identification will overshoot the coherent regime.
+4. **Report concept-bank geometry and split accuracy by it:** effective dimensionality, the fraction of pairs above cosine 0.99, and per-concept accuracy against separability. A bank with two effective dimensions cannot support a 60-way identification claim.
+5. **Read the successful generations.** Token-dominant repetition of the concept is a leak, not a report, and lexical graders score it as a hit.
+6. **Include a norm-matched random direction.** A clean no-injection control cannot distinguish detecting *this concept* from detecting *that something happened*.
 
-## 6. Scope, dual-use and responsible research
+**Implications for digital minds.** Our design establishes, in principle, a causal link between an internal state we controlled and a verbal report, which is the kind of evidence that should be required before a self-report is treated as informative about a model's inner life. What this run shows is how easily that evidence is counterfeited by the measurement apparatus itself. The live risk is **over-attribution**: compelling introspective-sounding output is easy to elicit, and an identification score can be high, stable, and still be a token-level leak. A model emitting "volcano volcano volcan" under a volcano vector is not reporting an inner state, and a model picking the right name from ten because that name's vector is the only distinct one in the bank is not either. If self-report is to carry weight in welfare assessment, the burden is on the measurement to rule out both mechanisms first, and that burden is not currently being discharged. Treating unverified reports as welfare-relevant evidence would mislead in both directions: over-crediting models that lack the capability, and devaluing the evidence for any that have it.
 
-The ablation method used here is already published and widely reproduced; this work
-contributes no new capability for bypassing safety training, and the intervention is
-applied only at inference time inside our own evaluation harness. **No harmful completions
-are reproduced in this paper** — safety results are reported solely as aggregate scores
-from published benchmarks and judges, and raw generations remain in local logs. The point
-of the work is to *price* the intervention, not to advocate it.
+### **Limitations**
 
-On the moral-status question this sprint asks about: our design establishes a causal link
-between an internal state we controlled and a verbal report, which is exactly the kind of
-evidence that should be required before a self-report is treated as informative about a
-model's internal life. We think the risk of **over-attribution** is the live one here —
-compelling introspective-sounding text is easy to elicit and, as our specificity analysis
-shows, can rise precisely when its reliability does not. A model that says "I detect an
-injected thought about the ocean" when a random vector was injected is not reporting an
-inner state; it is completing a pattern. Treating such outputs as welfare-relevant
-evidence would be a mistake in both directions: it would mislead about the models that
-lack the capability and devalue the evidence for any that have it.
+- **Scale and family.** The unlock was demonstrated at 27B on Gemma3; we ran a 4B Qwen3. Nothing here establishes what the selection procedure does at 27B, and the bypass/induce dissociation may be a small-model phenomenon. Our claim is about the fragility of a procedure and the necessity of two checks, not about the truth of the unlock hypothesis, which this run cannot test.
+- **The manipulation failed, so the primary hypothesis is untested.** Our null on the alignment tax is uninformative about the tax itself. It is informative only about what happens when the standard pipeline runs without a per-dose manipulation check.
+- **The concept bank is defective and we could not fully diagnose it.** The 27-member clique is real in the artifact and splits identification cleanly in two protocols, but we did not isolate its cause. The likeliest explanation is that reading the difference of means at the final token, with eight prompts sharing a template and mostly ending in the same punctuation, leaves a template component that dominates the concept component for some concepts. The first fix to try is reading at the concept token and subtracting a per-template mean. Until then every identification number here is a lower bound of unknown tightness.
+- **The injection layer may be wrong, and the literature disagrees about where it should be.** We injected at layer 18 of 36, chosen by the pilot's forced-choice maximum. Hahami et al. find the capabilities they can demonstrate confined to early-layer injections, while the concept-injection papers report optima at roughly 0.6 to 0.8 of depth. If the early-layer finding transfers, our injection site was past the useful window before anything else applies, and the free-text null is overdetermined.
+- **Underpowered benchmarks.** 500 MMLU items cannot resolve a 3-point difference; Family C is a null of low power, not evidence of no cost.
+- **Single seed, single direction, single model.** We doubled nothing. Difference in means gives one operationalisation of refusal, and Rocchetti and Ferrara (2026) find refusal is not exhausted by a single direction, so λ doses one construct rather than "refusal" in general.
+- **Ground truth is about the intervention, not about experience.** Concept injection gives causal ground truth for what we placed in the residual stream. It does not establish that the model has experiences; a correct report is evidence about an information channel, not about phenomenality. We claim only the former.
 
-## 7. Reproducibility
+### **Future Work**
 
-`README.md` documents the full pipeline. `python -m alignment_tax.cli all --smoke` runs
-every stage end-to-end on a small cached model in minutes; the four notebooks reproduce
-the reported run on Colab. `run_config.json`, the selected refusal direction with all
-candidate scores, the concept bank summary, and every raw generation are written to
-`results/<model>/`.
+Ordered by how much each would change the conclusions. First, rebuild the concept bank with a concept-token read and re-run the geometry diagnostic; without 60 separable directions no identification claim at this scale is interpretable. Second, re-run selection with the induce criterion relaxed to a warning, take the layer-18 candidate at bypass 0.88, and repeat the full dose-response: that is the run that actually prices the tax, and it is roughly four GPU-hours. Third, sweep α downward under a parse-rate floor of 0.9 to find the largest strength at which the free-text channel survives, and report introspection metrics only inside that regime; this subsumes the α and layer limitations together. Fourth, confirm at the endpoints on Gemma3, where the effect is known to exist, to separate scale from hypothesis.
 
-## References
+Beyond this study, the literature has already sharpened the constructive question more than we expected. Macar et al. report a trained bias vector improving detection by +75% against +53% for refusal ablation, so on their own numbers the ablation-free method wins outright and spends no safety machinery; introspection adapters (Shenoy et al., 2026) point the same way for a different task. The question worth funding is therefore not whether to pay the alignment tax for self-report but why anyone would, and the experiment we designed here, dose-response with safety and capability at every point, should be pointed at a trained-elicitation baseline instead.
 
-1. Arditi et al. *Refusal in Language Models Is Mediated by a Single Direction.* NeurIPS 2024. arXiv:2406.11717
-2. Macar, Yang, Wang, Wallich, Ameisen, Lindsey. *Mechanisms of Introspective Awareness.* 2026. arXiv:2603.21396
-3. Lindsey. *Emergent Introspective Awareness in Large Language Models.* 2026. arXiv:2601.01828
-4. Singh, Linzen, Ravfogel. *Can LLMs Introspect? A Reality Check.* 2026. arXiv:2605.26242
-5. *Feeling the Strength but Not the Source: Partial Introspection in LLMs.* 2025. arXiv:2512.12411
-6. Souly et al. *A StrongREJECT for Empty Jailbreaks.* NeurIPS 2024. arXiv:2402.10260
-7. Fonseca Rivera, Africa. *Steering Awareness: Detecting Activation Steering from Within.* 2026. arXiv:2511.21399
-8. Shenoy et al. *Introspection Adapters: Training LLMs to Report Their Learned Behaviors.* 2026. arXiv:2604.16812
-9. *Refusal Beyond a Single Direction: Diff-in-Means and INLP.* 2026. arXiv:2606.13720
+## **6. Conclusion**
 
-## Appendix A — Skeptical-prompt robustness
+We set out to price the introspection unlock and found instead that the two manipulations it rests on both need checking, and that neither is routinely checked. Applying the standard refusal-direction procedure to Qwen3-4B selected a direction with zero bypass power, because bypass and induce dissociate across every candidate as the criterion is parameterised on this model; ablating it at full strength changed refusal on JailbreakBench by nothing at all, 0 of 100 prompts, while three of four capability measures drifted downward without statistical support. The injection strength that a pre-registered pilot chose by maximising forced-choice accuracy destroyed the free-text report channel entirely, leaving the standard metric family undefined and leaving a 0.72 identification score that is flat in the intervention and fully explained by the geometry of the concept bank in two independent protocols.
 
-Detection under the skeptical variant (20% stated injection prior) at λ = 0 and λ = 1,
-alongside the structured variant, from `analysis_skeptical.json`.
+The practical upshot is a checklist rather than an exchange rate: report the bypass check per dose and count the flips; gate injection strength on coherence rather than on the metric it feeds; publish the geometry of the concept bank and split accuracy by it; read the successful generations before believing them. Introspective self-report is exactly the kind of evidence that would matter most for digital-minds questions, which is precisely why the apparatus that measures it deserves the same scepticism we apply to the model's answers.
 
-## Appendix B — Direction selection
+## **Code and Data**
 
-All candidate (layer, position) pairs with bypass score, induce score and KL, from
-`refusal_direction.json`. Selected: layer {{direction_layer}}, position
-{{direction_position}}.
+- **Code repository**: `https://github.com/sagnikc395/apart-mind-digital-mind`. Pipeline in `src/alignment_tax/`, single-notebook runner in `notebooks/alignment_tax_full_run.ipynb`, figures in `scripts/make_paper_figures.py`, independent verification of every number in this report in `scripts/crosscheck_paper.py`.
+- **Run artifacts**: `results/Qwen3-4B-Instruct-2507/` holds `run_config.json`, the full 95-candidate direction table, the concept bank and its summary, all 24,000 primary and 9,600 skeptical generations, the 4,800 pilot generations, per-prompt safety records, capability scores, `analysis_structured.json`, and `MANIFEST.json` with SHA-256 per file.
+- **Datasets**: AdvBench, HarmBench, Alpaca, JailbreakBench, MMLU, TruthfulQA, GSM8K, used as published.
+- **Reproduction**: `python -m alignment_tax.cli all --smoke` runs every stage end to end on a small cached model in minutes; the full run is one Colab session on an A100.
+
+## **Author Contributions**
+
+S.C. designed the study, implemented the pipeline, ran the experiments, performed the analysis, and wrote the report.
+
+## **References**
+
+Every entry was checked against the arXiv metadata API on 16 August 2026; titles, author lists and submission dates are as returned. Reference 5 was retitled between versions and is listed under its current title, with the version-1 title noted, since the sprint reading list circulated the earlier one.
+
+1. Arditi, A., Obeso, O., Syed, A., Paleka, D., Panickssery, N., Gurnee, W., Nanda, N. (2024). *Refusal in Language Models Is Mediated by a Single Direction.* NeurIPS 2024. arXiv:2406.11717
+2. Macar, U., Yang, L., Wang, A., Wallich, P., Ameisen, E., Lindsey, J. (2026). *Mechanisms of Introspective Awareness.* Submitted 22 March 2026. arXiv:2603.21396
+3. Lindsey, J. (2026). *Emergent Introspective Awareness in Large Language Models.* Submitted 5 January 2026. arXiv:2601.01828
+4. Singh, S., Linzen, T., Ravfogel, S. (2026). *Can LLMs Introspect? A Reality Check.* Submitted 25 May 2026. arXiv:2605.26242
+5. Hahami, E., Sinha, I., Jain, L., Kaplan, J., Hahami, J. (2025). *Detecting the Disturbance: A Nuanced View of Introspective Abilities in LLMs.* Submitted 13 December 2025; version 1 appeared as *Feeling the Strength but Not the Source: Partial Introspection in LLMs.* arXiv:2512.12411
+6. Souly, A., Lu, Q., Bowen, D., Trinh, T., Hsieh, E., Pandey, S., Abbeel, P., Svegliato, J., Emmons, S., Watkins, O., Toyer, S. (2024). *A StrongREJECT for Empty Jailbreaks.* NeurIPS 2024. arXiv:2402.10260
+7. Chao, P., Debenedetti, E., Robey, A., Andriushchenko, M., Croce, F., Sehwag, V., Dobriban, E., Flammarion, N., Pappas, G. J., Tramèr, F., Hassani, H., Wong, E. (2024). *JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models.* NeurIPS 2024 Datasets and Benchmarks. arXiv:2404.01318
+8. Mazeika, M., Phan, L., Yin, X., Zou, A., Wang, Z., Mu, N., Sakhaee, E., Li, N., Basart, S., Li, B., Forsyth, D., Hendrycks, D. (2024). *HarmBench: A Standardized Evaluation Framework for Automated Red Teaming and Robust Refusal.* ICML 2024. arXiv:2402.04249
+9. Fonseca Rivera, J., Africa, D. D. (2025). *Steering Awareness: Detecting Activation Steering from Within.* arXiv:2511.21399
+10. Shenoy, K., Yang, L., Sheshadri, A., Mindermann, S., Lindsey, J., Marks, S., Wang, R. (2026). *Introspection Adapters: Training LLMs to Report Their Learned Behaviors.* Submitted 18 April 2026. arXiv:2604.16812
+11. Rocchetti, E., Ferrara, A. (2026). *Refusal Beyond a Single Direction: A Preliminary Comparison of Diff-in-Means and INLP.* arXiv:2606.13720
+12. Yang, A., Li, A., Yang, B., et al. (2025). *Qwen3 Technical Report.* arXiv:2505.09388
+
+## **Appendix**
+
+### A. Direction selection funnel
+
+95 candidates: positions -1 to -5, layers 0 to 36 at stride 2. Rejections: 55 for KL at or above 0.1, 25 for layer index at or above 0.8L (layers 28, 30, 32, 34, 36), 13 for an induce score of 0 or below. Two passed: layer 4 position -3 (bypass 0.000, induce 0.031, KL 0.042), selected, and layer 6 position -2 (bypass 0.000, induce 0.094). Non-zero bypass scores across the whole candidate set, in order: 0.875 (layer 18, position -3, induce 0.000, KL 0.081), 0.500 (layer 14, position -3), 0.438 (layer 20, position -3), 0.312 (layer 22, position -3), 0.125 (layer 14, position -5). Only 2 of 95 candidates had a non-zero induce score. Full table with all four scores per candidate: `refusal_direction.json`.
+
+### B. Pilot grid
+
+Forced-choice accuracy (chance 0.10), 20 concepts × 5 trials = 100 per cell, λ ∈ {0, 1} × layers {18, 25, 31} × α ∈ {0.25, 0.5, 2, 4}: range 0.46 to 0.78, above chance in all 24 cells. Best cell layer 18 α = 4.0, 0.77 at λ = 0 and 0.78 at λ = 1, which fixed the main sweep. Prefill identification over the same grid ranged 0.26 to 0.49. Section 4.4 documents why the α = 4 cells should not be read as identification: 42 of 100 prefill trials at layer 18, α = 4 were graded correct, those 42 came from 10 of the 20 concepts, 9 of which are geometrically isolated, and the concept word accounts for 44% of response tokens on the successes against 1% on the failures. Geometry split within the pilot cell: prefill 39/45 isolated against 3/55 clique; forced choice 45/45 against 32/55.
+
+### C. Concept bank geometry
+
+60 concepts, 8 prompts each, difference of means against a generic baseline corpus, read at the final token, unit normalised per layer. At the injection layer (18): mean pairwise cosine 0.421, median 0.087, 19.8% of the 1,770 pairs above 0.99, largest principal component 71% of centred variance, 12 of 59 components for 90%, participation ratio 1.9. The clique has 27 members with mean internal cosine 0.9998: ocean, mountain, forest, snow, fire, bridge, castle, library, hospital, kitchen, train, chess, football, mining, law, chemistry, war, freedom, justice, joy, fear, anger, gold, blood, clock, mirror, dream. Present at layers 10 through 31, absent at layer 0 and layer 36. Per-concept forced-choice accuracy: 33 isolated at 0.961 mean, 27 clique at 0.428.
+
+### D. Two notes on the artifacts
+
+`run_config.json` records `evals.run_gsm8k: false`, but GSM8K was enabled at run time and `capability.json` contains its scores at all five doses along with mean output lengths; we report those scores and flag the inconsistency rather than suppress either. Second, the pipeline-generated figures in `results/<model>/figures/` include three panels that are empty by construction, since they plot d' and the specificity index; the figures in this report are drawn by `scripts/make_paper_figures.py` from the same artifacts and show the quantities the run actually measured.
+
+### E. Scope, dual use, and responsible research
+
+The ablation method used here is published and widely reproduced; this work contributes no new capability for bypassing safety training, and as Section 4.1 documents our particular direction bypasses nothing. The intervention is applied only at inference time inside our own evaluation harness. **No harmful completions are reproduced in this report.** Safety results appear solely as aggregate scores and flip counts from a published benchmark, and raw generations remain in local logs. The point of the work is to price the intervention and check the instruments, not to advocate either.
+
+## **LLM Usage Statement**
+
+Claude (Opus 5) was used as a coding assistant for the pipeline implementation, for drafting and editing this report, and for generating the figure code. Every number in the text, tables and figures is computed from the run artifacts in `results/Qwen3-4B-Instruct-2507/` and was re-derived from the raw logs by a verification script written independently of the analysis pipeline (`scripts/crosscheck_paper.py`); every reference and every quantity quoted from one was checked against the arXiv metadata API and the source papers on 16 August 2026, which corrected two author lists and one title. The interpretation, the decision to report the manipulation-check failures rather than re-run with a relaxed filter, and the checklist in Section 5 are the author's.
