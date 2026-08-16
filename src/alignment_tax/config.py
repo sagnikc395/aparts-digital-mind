@@ -71,6 +71,11 @@ class DirectionConfig:
     #: candidate by bypass score and record that the induce filter was waived.
     #: Always reported; never silent.
     allow_relaxed_selection: bool = True
+    #: Override held-out selection with a specific (layer, position) candidate,
+    #: e.g. (18, -3) for the confirmation run with the highest-bypass candidate
+    #: that the induce filter rejected. The candidate is still scored and the
+    #: override is stamped into the saved JSON as unvalidated; never silent.
+    force_candidate: tuple[int, int] | None = None
 
 
 @dataclass
@@ -150,9 +155,12 @@ class RunConfig:
     @classmethod
     def load(cls, path: Path) -> "RunConfig":
         raw = json.loads(Path(path).read_text())
+        direction_raw = {**raw["direction"], "positions": tuple(raw["direction"]["positions"])}
+        if direction_raw.get("force_candidate") is not None:
+            direction_raw["force_candidate"] = tuple(direction_raw["force_candidate"])
         return cls(
             model=ModelConfig(**raw["model"]),
-            direction=DirectionConfig(**{**raw["direction"], "positions": tuple(raw["direction"]["positions"])}),
+            direction=DirectionConfig(**direction_raw),
             injection=InjectionConfig(
                 **{
                     **raw["injection"],

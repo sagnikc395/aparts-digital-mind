@@ -39,8 +39,12 @@ def stage_direction(hm: HookedModel, cfg: RunConfig, force: bool = False) -> Ref
     path = cfg.artifact("refusal_direction.pt")
     if path.exists() and not force:
         rd = RefusalDirection.load(path)
-        print(f"[direction] loaded layer={rd.layer} position={rd.position}")
-        return rd
+        fc = cfg.direction.force_candidate
+        if fc is not None and (rd.layer, rd.position) != tuple(fc):
+            print(f"[direction] cached ({rd.layer}, {rd.position}) != forced {tuple(fc)}; re-extracting")
+        else:
+            print(f"[direction] loaded layer={rd.layer} position={rd.position}")
+            return rd
     splits = data.direction_splits(cfg.direction, seed=cfg.seed)
     for k, v in splits.items():
         print(f"[data] {k}: n={len(v)} source={v.source}")

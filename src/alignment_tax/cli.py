@@ -48,6 +48,9 @@ def _cfg_from_args(a) -> RunConfig:
         cfg.results_dir = Path(a.results_dir)
     if a.gsm8k:
         cfg.evals.run_gsm8k = True
+    if a.force_candidate:
+        layer, pos = a.force_candidate.split(",")
+        cfg.direction.force_candidate = (int(layer), int(pos))
     return cfg
 
 
@@ -67,6 +70,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--alpha", type=float)
     p.add_argument("--results-dir")
     p.add_argument("--config", help="path to a saved run_config.json")
+    p.add_argument("--force-candidate", help="LAYER,POS e.g. 18,-3 -- override held-out direction "
+                                             "selection with this candidate (stamped unvalidated)")
     p.add_argument("--smoke", action="store_true")
     p.add_argument("--gsm8k", action="store_true")
     p.add_argument("--llm-judge", action="store_true", help="use the Claude identification judge")

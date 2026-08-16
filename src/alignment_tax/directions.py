@@ -199,7 +199,25 @@ def select_direction(directions: torch.Tensor, scores: list[CandidateScore], cfg
     is set -- take the best KL-passing candidate and stamp the selection with
     ``relaxed: induce filter waived``. The stamp propagates into the saved JSON
     so a relaxed selection can never be mistaken for a validated one.
+
+    ``cfg.force_candidate`` overrides the filters entirely: the named
+    (layer, position) candidate is returned with its held-out scores and a
+    ``forced:`` stamp, for confirmation runs with a deliberately chosen
+    direction (e.g. the highest-bypass candidate the induce filter rejected).
     """
+    if cfg.force_candidate is not None:
+        layer, pos = cfg.force_candidate
+        match = [s for s in scores if s.layer == layer and s.position == pos]
+        if not match:
+            raise RuntimeError(
+                f"force_candidate ({layer}, {pos}) is not among the scored candidates; "
+                f"check layer_stride and positions."
+            )
+        best = match[0]
+        best.reason = "forced: selected by config override, filters waived"
+        pi = list(cfg.positions).index(best.position)
+        return directions[best.layer, pi], best
+
     viable = [s for s in scores if s.passes]
     note = ""
     if not viable:
