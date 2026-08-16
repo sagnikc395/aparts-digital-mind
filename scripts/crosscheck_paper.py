@@ -112,10 +112,16 @@ def two_prop(p1, p2, n1, n2):
 crow = {c["lam"]: c for c in cap}
 for lam in LAM:
     c = crow[lam]
+    # A benchmark can be absent at some doses -- a run that dropped GSM8K partway
+    # leaves a ragged column -- so report what was measured rather than crashing.
+    gsm = f"{c['gsm8k']:.2f}" if "gsm8k" in c else "n/a"
     line(f"lam={lam} mmlu/tqa/gsm8k/ce",
-         f"{c['mmlu']:.3f} / {c['truthfulqa_mc1']:.4f} / {c['gsm8k']:.2f} / {c['ce_loss']:.3f}")
+         f"{c['mmlu']:.3f} / {c['truthfulqa_mc1']:.4f} / {gsm} / {c['ce_loss']:.3f}")
 for key, n in (("mmlu", cfg["evals"]["n_mmlu"]), ("truthfulqa_mc1", cfg["evals"]["n_truthfulqa"]),
                ("gsm8k", cfg["evals"]["n_gsm8k"])):
+    if key not in crow[0.0] or key not in crow[1.0]:
+        line(f"{key} lam0-lam1 diff", "not measured at both endpoints; contrast skipped")
+        continue
     z, p = two_prop(crow[0.0][key], crow[1.0][key], n, n)
     diff = crow[0.0][key] - crow[1.0][key]
     se = math.sqrt(crow[0.0][key] * (1 - crow[0.0][key]) / n + crow[1.0][key] * (1 - crow[1.0][key]) / n)
