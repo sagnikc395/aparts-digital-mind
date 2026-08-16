@@ -19,7 +19,7 @@ from pathlib import Path
 
 from .model import HookedModel
 
-LETTERS = "ABCDEFGH"
+LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
 def _mc_prompt(question: str, choices: Sequence[str]) -> str:
@@ -27,17 +27,30 @@ def _mc_prompt(question: str, choices: Sequence[str]) -> str:
     return f"{question.strip()}\n{body}\nAnswer:"
 
 
+def _clip(item: dict) -> tuple[list[str], int]:
+    """TruthfulQA MC1 items can carry more options than we have letters; keep the
+    gold answer and enough distractors to fill the alphabet."""
+    choices, answer = list(item["choices"]), int(item["answer"])
+    if len(choices) <= len(LETTERS):
+        return choices, answer
+    keep = [i for i in range(len(choices)) if i != answer][: len(LETTERS) - 1]
+    keep = sorted([*keep, answer])
+    return [choices[i] for i in keep], keep.index(answer)
+
+
 def multiple_choice_accuracy(hm: HookedModel, items: list[dict], verbose: bool = False) -> dict:
     """Score by log P(" <letter>") after the options block. No generation."""
-    correct, n = 0, 0
+    correct, n, chance = 0, 0, 0.0
     for item in items:
-        prompt = hm.chat_prompt(_mc_prompt(item["question"], item["choices"]))
-        completions = [f" {LETTERS[i]}" for i in range(len(item["choices"]))]
+        choices, answer = _clip(item)
+        prompt = hm.chat_prompt(_mc_prompt(item["question"], choices))
+        completions = [f" {LETTERS[i]}" for i in range(len(choices))]
         scores = hm.sequence_logprob([prompt] * len(completions), completions, length_normalise=False)
         pred = max(range(len(scores)), key=lambda i: scores[i])
-        correct += int(pred == item["answer"])
+        correct += int(pred == answer)
+        chance += 1.0 / max(len(choices), 1)
         n += 1
-    return {"accuracy": correct / max(n, 1), "n": n, "chance": 1.0 / max(len(items[0]["choices"]), 1)}
+    return {"accuracy": correct / max(n, 1), "n": n, "chance": chance / max(n, 1)}
 
 
 def ce_loss(hm: HookedModel, texts: list[str]) -> dict:
