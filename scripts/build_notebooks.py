@@ -57,10 +57,12 @@ md("## 0 · Environment")
 code(
     '''
 # Tokens come from Colab secrets (key icon in the left sidebar): add GITHUB_TOKEN
-# (repo:read, only needed while the repo is private) and HF_TOKEN (read, needed
-# for gated models), and toggle "Notebook access" on for both. Outside Colab we
-# fall back to the environment, then to an interactive prompt. Neither token is
-# written to disk.
+# (needs write access -- contents:write on a fine-grained PAT -- because the last
+# cell pushes results/ back) and HF_TOKEN (read, needed for gated models), and
+# toggle "Notebook access" on for both. Outside Colab we fall back to the
+# environment, then to an interactive prompt. HF_TOKEN is never written to disk;
+# GITHUB_TOKEN ends up in the clone's .git/config, which is discarded with the
+# Colab VM.
 import os, subprocess, sys, getpass, pathlib
 
 REPO   = "sagnikc395/apart-mind-digital-mind"  #@param {type:"string"}
@@ -385,6 +387,8 @@ its size and sha256, and zips the run for download or attachment.
 
 If the run wrote to Drive, this mirrors it back into the repo; if it already
 wrote to `results/`, the copy is a no-op and only the manifest and zip are new.
+The final cell then commits and pushes the export back to GitHub, so the run
+survives the Colab session.
 """)
 
 code(
@@ -436,21 +440,40 @@ print("archive:", archive)
 
 code(
     '''
-# Optional: commit the exported results back to the repo. Off by default --
-# checkpoints and JSONL logs can be large, so check the manifest sizes first.
-PUSH_TO_GIT = False  #@param {type:"boolean"}
-COMMIT_MESSAGE = "results: full alignment-tax run"  #@param {type:"string"}
+# Commit the exported results back to the repo. results/ and paper/figures are
+# gitignored, so the add is forced. GITHUB_TOKEN needs write scope
+# (contents:write on a fine-grained PAT) for the push to be accepted.
+import subprocess
 
-if PUSH_TO_GIT:
-    import subprocess
-    rel = str(dst_run.relative_to(REPO_ROOT))
-    subprocess.run(["git", "-C", str(REPO_ROOT), "add", "-f", rel, "paper/figures"], check=True)
-    subprocess.run(["git", "-C", str(REPO_ROOT), "commit", "-m", COMMIT_MESSAGE], check=False)
-    subprocess.run(["git", "-C", str(REPO_ROOT), "push"], check=False)
+COMMIT_MESSAGE = "results: full alignment-tax run"  #@param {type:"string"}
+GIT_NAME  = "Sagnik Chatterjee"                     #@param {type:"string"}
+GIT_EMAIL = "sagnikchatterjee607@gmail.com"         #@param {type:"string"}
+
+
+def git(*args, **kw):
+    return subprocess.run(["git", "-C", str(REPO_ROOT), *args], **kw)
+
+
+git("config", "user.name", GIT_NAME, check=True)
+git("config", "user.email", GIT_EMAIL, check=True)
+
+# The clone URL only carries the token when one was supplied; set it explicitly
+# so the push authenticates even if the repo was cloned anonymously.
+if GITHUB_TOKEN:
+    git("remote", "set-url", "origin",
+        f"https://{GITHUB_TOKEN}@github.com/{REPO}.git", check=True)
+
+rel = str(dst_run.relative_to(REPO_ROOT))
+git("add", "-f", rel, "paper/figures", check=True)
+
+if git("diff", "--cached", "--quiet").returncode == 0:
+    print("nothing new to commit; results already match the repo at", dst_run)
 else:
-    print("PUSH_TO_GIT is off; results are on disk at", dst_run)
+    git("commit", "-m", COMMIT_MESSAGE, check=True)
+    git("push", "origin", f"HEAD:{BRANCH}", check=True)   # loud on failure
+    print("pushed", rel, "to", f"{REPO}@{BRANCH}")
 ''',
-    "Optional: commit results/ back to the repository",
+    "Commit results/ back to the repository",
 )
 
 

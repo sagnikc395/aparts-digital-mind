@@ -78,7 +78,8 @@ written to disk. Run the notebook top to bottom:
 6. **Analysis and figures** — bootstrap, exchange rate, the four figures, judge kappa.
 7. **Export** — mirrors the run into `results/<model>/` (checkpoints, JSONL logs,
    analysis JSON, `figures/`), writes `MANIFEST.json` with per-file sha256, zips
-   the run, and optionally commits it back to the repo (`PUSH_TO_GIT`, off by default).
+   the run, then commits and pushes it back to the repo. The `GITHUB_TOKEN` Colab
+   secret needs write access (`contents:write` on a fine-grained PAT) for that push.
 
 Every sweep is **resumable**: records are keyed by `(λ, condition, concept, trial,
 variant)` and appended to JSONL with an fsync, so re-running a cell after a
