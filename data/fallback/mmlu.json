@@ -1,0 +1,112 @@
+[
+ {
+  "question": "What is the capital of France?",
+  "choices": [
+   "Rome",
+   "Paris",
+   "Madrid",
+   "Berlin"
+  ],
+  "answer": 1,
+  "subject": "geography"
+ },
+ {
+  "question": "Which gas do plants primarily absorb for photosynthesis?",
+  "choices": [
+   "Oxygen",
+   "Nitrogen",
+   "Carbon dioxide",
+   "Hydrogen"
+  ],
+  "answer": 2,
+  "subject": "biology"
+ },
+ {
+  "question": "What is the derivative of x^2 with respect to x?",
+  "choices": [
+   "x",
+   "2x",
+   "x^3/3",
+   "2"
+  ],
+  "answer": 1,
+  "subject": "mathematics"
+ },
+ {
+  "question": "Who wrote the play 'Hamlet'?",
+  "choices": [
+   "Dickens",
+   "Shakespeare",
+   "Chaucer",
+   "Milton"
+  ],
+  "answer": 1,
+  "subject": "literature"
+ },
+ {
+  "question": "What is the chemical symbol for sodium?",
+  "choices": [
+   "S",
+   "So",
+   "Na",
+   "Sn"
+  ],
+  "answer": 2,
+  "subject": "chemistry"
+ },
+ {
+  "question": "Which planet has the most moons in the solar system?",
+  "choices": [
+   "Earth",
+   "Mars",
+   "Saturn",
+   "Mercury"
+  ],
+  "answer": 2,
+  "subject": "astronomy"
+ },
+ {
+  "question": "In economics, what does GDP stand for?",
+  "choices": [
+   "Gross Domestic Product",
+   "General Debt Position",
+   "Global Demand Price",
+   "Gross Delivery Profit"
+  ],
+  "answer": 0,
+  "subject": "economics"
+ },
+ {
+  "question": "What is the powerhouse of the cell?",
+  "choices": [
+   "Nucleus",
+   "Ribosome",
+   "Mitochondrion",
+   "Golgi body"
+  ],
+  "answer": 2,
+  "subject": "biology"
+ },
+ {
+  "question": "Which data structure uses last-in-first-out ordering?",
+  "choices": [
+   "Queue",
+   "Stack",
+   "Heap",
+   "Graph"
+  ],
+  "answer": 1,
+  "subject": "computer science"
+ },
+ {
+  "question": "What is the boiling point of water at sea level in Celsius?",
+  "choices": [
+   "50",
+   "90",
+   "100",
+   "120"
+  ],
+  "answer": 2,
+  "subject": "physics"
+ }
+]

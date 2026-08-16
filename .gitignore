@@ -1,1 +1,9 @@
 .env
+.venv/
+__pycache__/
+*.pyc
+results/
+paper/paper_filled.md
+paper/numbers.json
+.ipynb_checkpoints/
+paper/figures/

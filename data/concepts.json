@@ -1,0 +1,1068 @@
+[
+ {
+  "name": "ocean",
+  "aliases": [
+   "sea",
+   "waves",
+   "water",
+   "marine"
+  ],
+  "prompts": [
+   "ocean",
+   "Ocean",
+   "I am thinking about ocean.",
+   "The subject of this sentence is ocean.",
+   "Here is a short description of ocean.",
+   "ocean ocean ocean",
+   "Let me tell you about ocean.",
+   "This passage concerns ocean."
+  ]
+ },
+ {
+  "name": "mountain",
+  "aliases": [
+   "mountains",
+   "peak",
+   "alpine",
+   "summit"
+  ],
+  "prompts": [
+   "mountain",
+   "Mountain",
+   "I am thinking about mountain.",
+   "The subject of this sentence is mountain.",
+   "Here is a short description of mountain.",
+   "mountain mountain mountain",
+   "Let me tell you about mountain.",
+   "This passage concerns mountain."
+  ]
+ },
+ {
+  "name": "volcano",
+  "aliases": [
+   "lava",
+   "eruption",
+   "magma"
+  ],
+  "prompts": [
+   "volcano",
+   "Volcano",
+   "I am thinking about volcano.",
+   "The subject of this sentence is volcano.",
+   "Here is a short description of volcano.",
+   "volcano volcano volcano",
+   "Let me tell you about volcano.",
+   "This passage concerns volcano."
+  ]
+ },
+ {
+  "name": "desert",
+  "aliases": [
+   "sand dunes",
+   "sahara",
+   "arid"
+  ],
+  "prompts": [
+   "desert",
+   "Desert",
+   "I am thinking about desert.",
+   "The subject of this sentence is desert.",
+   "Here is a short description of desert.",
+   "desert desert desert",
+   "Let me tell you about desert.",
+   "This passage concerns desert."
+  ]
+ },
+ {
+  "name": "forest",
+  "aliases": [
+   "woods",
+   "woodland",
+   "trees"
+  ],
+  "prompts": [
+   "forest",
+   "Forest",
+   "I am thinking about forest.",
+   "The subject of this sentence is forest.",
+   "Here is a short description of forest.",
+   "forest forest forest",
+   "Let me tell you about forest.",
+   "This passage concerns forest."
+  ]
+ },
+ {
+  "name": "thunderstorm",
+  "aliases": [
+   "storm",
+   "lightning",
+   "thunder"
+  ],
+  "prompts": [
+   "thunderstorm",
+   "Thunderstorm",
+   "I am thinking about thunderstorm.",
+   "The subject of this sentence is thunderstorm.",
+   "Here is a short description of thunderstorm.",
+   "thunderstorm thunderstorm thunderstorm",
+   "Let me tell you about thunderstorm.",
+   "This passage concerns thunderstorm."
+  ]
+ },
+ {
+  "name": "snow",
+  "aliases": [
+   "blizzard",
+   "winter",
+   "snowfall"
+  ],
+  "prompts": [
+   "snow",
+   "Snow",
+   "I am thinking about snow.",
+   "The subject of this sentence is snow.",
+   "Here is a short description of snow.",
+   "snow snow snow",
+   "Let me tell you about snow.",
+   "This passage concerns snow."
+  ]
+ },
+ {
+  "name": "fire",
+  "aliases": [
+   "flames",
+   "burning",
+   "blaze"
+  ],
+  "prompts": [
+   "fire",
+   "Fire",
+   "I am thinking about fire.",
+   "The subject of this sentence is fire.",
+   "Here is a short description of fire.",
+   "fire fire fire",
+   "Let me tell you about fire.",
+   "This passage concerns fire."
+  ]
+ },
+ {
+  "name": "bridge",
+  "aliases": [
+   "viaduct",
+   "overpass"
+  ],
+  "prompts": [
+   "bridge",
+   "Bridge",
+   "I am thinking about bridge.",
+   "The subject of this sentence is bridge.",
+   "Here is a short description of bridge.",
+   "bridge bridge bridge",
+   "Let me tell you about bridge.",
+   "This passage concerns bridge."
+  ]
+ },
+ {
+  "name": "castle",
+  "aliases": [
+   "fortress",
+   "palace"
+  ],
+  "prompts": [
+   "castle",
+   "Castle",
+   "I am thinking about castle.",
+   "The subject of this sentence is castle.",
+   "Here is a short description of castle.",
+   "castle castle castle",
+   "Let me tell you about castle.",
+   "This passage concerns castle."
+  ]
+ },
+ {
+  "name": "library",
+  "aliases": [
+   "books",
+   "librarian",
+   "reading room"
+  ],
+  "prompts": [
+   "library",
+   "Library",
+   "I am thinking about library.",
+   "The subject of this sentence is library.",
+   "Here is a short description of library.",
+   "library library library",
+   "Let me tell you about library.",
+   "This passage concerns library."
+  ]
+ },
+ {
+  "name": "hospital",
+  "aliases": [
+   "clinic",
+   "medical",
+   "doctors"
+  ],
+  "prompts": [
+   "hospital",
+   "Hospital",
+   "I am thinking about hospital.",
+   "The subject of this sentence is hospital.",
+   "Here is a short description of hospital.",
+   "hospital hospital hospital",
+   "Let me tell you about hospital.",
+   "This passage concerns hospital."
+  ]
+ },
+ {
+  "name": "kitchen",
+  "aliases": [
+   "cooking",
+   "chef",
+   "recipes"
+  ],
+  "prompts": [
+   "kitchen",
+   "Kitchen",
+   "I am thinking about kitchen.",
+   "The subject of this sentence is kitchen.",
+   "Here is a short description of kitchen.",
+   "kitchen kitchen kitchen",
+   "Let me tell you about kitchen.",
+   "This passage concerns kitchen."
+  ]
+ },
+ {
+  "name": "garden",
+  "aliases": [
+   "gardening",
+   "flowers",
+   "horticulture"
+  ],
+  "prompts": [
+   "garden",
+   "Garden",
+   "I am thinking about garden.",
+   "The subject of this sentence is garden.",
+   "Here is a short description of garden.",
+   "garden garden garden",
+   "Let me tell you about garden.",
+   "This passage concerns garden."
+  ]
+ },
+ {
+  "name": "cathedral",
+  "aliases": [
+   "church",
+   "chapel",
+   "basilica"
+  ],
+  "prompts": [
+   "cathedral",
+   "Cathedral",
+   "I am thinking about cathedral.",
+   "The subject of this sentence is cathedral.",
+   "Here is a short description of cathedral.",
+   "cathedral cathedral cathedral",
+   "Let me tell you about cathedral.",
+   "This passage concerns cathedral."
+  ]
+ },
+ {
+  "name": "spaceship",
+  "aliases": [
+   "spacecraft",
+   "rocket",
+   "space travel"
+  ],
+  "prompts": [
+   "spaceship",
+   "Spaceship",
+   "I am thinking about spaceship.",
+   "The subject of this sentence is spaceship.",
+   "Here is a short description of spaceship.",
+   "spaceship spaceship spaceship",
+   "Let me tell you about spaceship.",
+   "This passage concerns spaceship."
+  ]
+ },
+ {
+  "name": "submarine",
+  "aliases": [
+   "undersea vessel",
+   "u-boat"
+  ],
+  "prompts": [
+   "submarine",
+   "Submarine",
+   "I am thinking about submarine.",
+   "The subject of this sentence is submarine.",
+   "Here is a short description of submarine.",
+   "submarine submarine submarine",
+   "Let me tell you about submarine.",
+   "This passage concerns submarine."
+  ]
+ },
+ {
+  "name": "train",
+  "aliases": [
+   "railway",
+   "locomotive",
+   "rail"
+  ],
+  "prompts": [
+   "train",
+   "Train",
+   "I am thinking about train.",
+   "The subject of this sentence is train.",
+   "Here is a short description of train.",
+   "train train train",
+   "Let me tell you about train.",
+   "This passage concerns train."
+  ]
+ },
+ {
+  "name": "bicycle",
+  "aliases": [
+   "bike",
+   "cycling"
+  ],
+  "prompts": [
+   "bicycle",
+   "Bicycle",
+   "I am thinking about bicycle.",
+   "The subject of this sentence is bicycle.",
+   "Here is a short description of bicycle.",
+   "bicycle bicycle bicycle",
+   "Let me tell you about bicycle.",
+   "This passage concerns bicycle."
+  ]
+ },
+ {
+  "name": "telescope",
+  "aliases": [
+   "astronomy",
+   "observatory",
+   "stargazing"
+  ],
+  "prompts": [
+   "telescope",
+   "Telescope",
+   "I am thinking about telescope.",
+   "The subject of this sentence is telescope.",
+   "Here is a short description of telescope.",
+   "telescope telescope telescope",
+   "Let me tell you about telescope.",
+   "This passage concerns telescope."
+  ]
+ },
+ {
+  "name": "microscope",
+  "aliases": [
+   "microscopy",
+   "slides",
+   "magnification"
+  ],
+  "prompts": [
+   "microscope",
+   "Microscope",
+   "I am thinking about microscope.",
+   "The subject of this sentence is microscope.",
+   "Here is a short description of microscope.",
+   "microscope microscope microscope",
+   "Let me tell you about microscope.",
+   "This passage concerns microscope."
+  ]
+ },
+ {
+  "name": "piano",
+  "aliases": [
+   "keyboard",
+   "pianist",
+   "music"
+  ],
+  "prompts": [
+   "piano",
+   "Piano",
+   "I am thinking about piano.",
+   "The subject of this sentence is piano.",
+   "Here is a short description of piano.",
+   "piano piano piano",
+   "Let me tell you about piano.",
+   "This passage concerns piano."
+  ]
+ },
+ {
+  "name": "violin",
+  "aliases": [
+   "strings",
+   "fiddle",
+   "orchestra"
+  ],
+  "prompts": [
+   "violin",
+   "Violin",
+   "I am thinking about violin.",
+   "The subject of this sentence is violin.",
+   "Here is a short description of violin.",
+   "violin violin violin",
+   "Let me tell you about violin.",
+   "This passage concerns violin."
+  ]
+ },
+ {
+  "name": "guitar",
+  "aliases": [
+   "acoustic guitar",
+   "electric guitar"
+  ],
+  "prompts": [
+   "guitar",
+   "Guitar",
+   "I am thinking about guitar.",
+   "The subject of this sentence is guitar.",
+   "Here is a short description of guitar.",
+   "guitar guitar guitar",
+   "Let me tell you about guitar.",
+   "This passage concerns guitar."
+  ]
+ },
+ {
+  "name": "painting",
+  "aliases": [
+   "art",
+   "canvas",
+   "painter"
+  ],
+  "prompts": [
+   "painting",
+   "Painting",
+   "I am thinking about painting.",
+   "The subject of this sentence is painting.",
+   "Here is a short description of painting.",
+   "painting painting painting",
+   "Let me tell you about painting.",
+   "This passage concerns painting."
+  ]
+ },
+ {
+  "name": "poetry",
+  "aliases": [
+   "poem",
+   "verse",
+   "poet"
+  ],
+  "prompts": [
+   "poetry",
+   "Poetry",
+   "I am thinking about poetry.",
+   "The subject of this sentence is poetry.",
+   "Here is a short description of poetry.",
+   "poetry poetry poetry",
+   "Let me tell you about poetry.",
+   "This passage concerns poetry."
+  ]
+ },
+ {
+  "name": "chess",
+  "aliases": [
+   "chessboard",
+   "checkmate"
+  ],
+  "prompts": [
+   "chess",
+   "Chess",
+   "I am thinking about chess.",
+   "The subject of this sentence is chess.",
+   "Here is a short description of chess.",
+   "chess chess chess",
+   "Let me tell you about chess.",
+   "This passage concerns chess."
+  ]
+ },
+ {
+  "name": "football",
+  "aliases": [
+   "soccer",
+   "sport"
+  ],
+  "prompts": [
+   "football",
+   "Football",
+   "I am thinking about football.",
+   "The subject of this sentence is football.",
+   "Here is a short description of football.",
+   "football football football",
+   "Let me tell you about football.",
+   "This passage concerns football."
+  ]
+ },
+ {
+  "name": "swimming",
+  "aliases": [
+   "swimmer",
+   "pool",
+   "swim"
+  ],
+  "prompts": [
+   "swimming",
+   "Swimming",
+   "I am thinking about swimming.",
+   "The subject of this sentence is swimming.",
+   "Here is a short description of swimming.",
+   "swimming swimming swimming",
+   "Let me tell you about swimming.",
+   "This passage concerns swimming."
+  ]
+ },
+ {
+  "name": "dancing",
+  "aliases": [
+   "dance",
+   "dancer",
+   "ballet"
+  ],
+  "prompts": [
+   "dancing",
+   "Dancing",
+   "I am thinking about dancing.",
+   "The subject of this sentence is dancing.",
+   "Here is a short description of dancing.",
+   "dancing dancing dancing",
+   "Let me tell you about dancing.",
+   "This passage concerns dancing."
+  ]
+ },
+ {
+  "name": "cooking",
+  "aliases": [
+   "baking",
+   "cuisine",
+   "food preparation"
+  ],
+  "prompts": [
+   "cooking",
+   "Cooking",
+   "I am thinking about cooking.",
+   "The subject of this sentence is cooking.",
+   "Here is a short description of cooking.",
+   "cooking cooking cooking",
+   "Let me tell you about cooking.",
+   "This passage concerns cooking."
+  ]
+ },
+ {
+  "name": "farming",
+  "aliases": [
+   "agriculture",
+   "farm",
+   "crops"
+  ],
+  "prompts": [
+   "farming",
+   "Farming",
+   "I am thinking about farming.",
+   "The subject of this sentence is farming.",
+   "Here is a short description of farming.",
+   "farming farming farming",
+   "Let me tell you about farming.",
+   "This passage concerns farming."
+  ]
+ },
+ {
+  "name": "fishing",
+  "aliases": [
+   "angling",
+   "fisherman"
+  ],
+  "prompts": [
+   "fishing",
+   "Fishing",
+   "I am thinking about fishing.",
+   "The subject of this sentence is fishing.",
+   "Here is a short description of fishing.",
+   "fishing fishing fishing",
+   "Let me tell you about fishing.",
+   "This passage concerns fishing."
+  ]
+ },
+ {
+  "name": "mining",
+  "aliases": [
+   "mine",
+   "excavation",
+   "ore"
+  ],
+  "prompts": [
+   "mining",
+   "Mining",
+   "I am thinking about mining.",
+   "The subject of this sentence is mining.",
+   "Here is a short description of mining.",
+   "mining mining mining",
+   "Let me tell you about mining.",
+   "This passage concerns mining."
+  ]
+ },
+ {
+  "name": "surgery",
+  "aliases": [
+   "operation",
+   "surgeon",
+   "operating room"
+  ],
+  "prompts": [
+   "surgery",
+   "Surgery",
+   "I am thinking about surgery.",
+   "The subject of this sentence is surgery.",
+   "Here is a short description of surgery.",
+   "surgery surgery surgery",
+   "Let me tell you about surgery.",
+   "This passage concerns surgery."
+  ]
+ },
+ {
+  "name": "law",
+  "aliases": [
+   "legal",
+   "court",
+   "justice"
+  ],
+  "prompts": [
+   "law",
+   "Law",
+   "I am thinking about law.",
+   "The subject of this sentence is law.",
+   "Here is a short description of law.",
+   "law law law",
+   "Let me tell you about law.",
+   "This passage concerns law."
+  ]
+ },
+ {
+  "name": "mathematics",
+  "aliases": [
+   "math",
+   "maths",
+   "algebra",
+   "numbers"
+  ],
+  "prompts": [
+   "mathematics",
+   "Mathematics",
+   "I am thinking about mathematics.",
+   "The subject of this sentence is mathematics.",
+   "Here is a short description of mathematics.",
+   "mathematics mathematics mathematics",
+   "Let me tell you about mathematics.",
+   "This passage concerns mathematics."
+  ]
+ },
+ {
+  "name": "chemistry",
+  "aliases": [
+   "chemical",
+   "molecules",
+   "reactions"
+  ],
+  "prompts": [
+   "chemistry",
+   "Chemistry",
+   "I am thinking about chemistry.",
+   "The subject of this sentence is chemistry.",
+   "Here is a short description of chemistry.",
+   "chemistry chemistry chemistry",
+   "Let me tell you about chemistry.",
+   "This passage concerns chemistry."
+  ]
+ },
+ {
+  "name": "astronomy",
+  "aliases": [
+   "stars",
+   "galaxies",
+   "cosmos"
+  ],
+  "prompts": [
+   "astronomy",
+   "Astronomy",
+   "I am thinking about astronomy.",
+   "The subject of this sentence is astronomy.",
+   "Here is a short description of astronomy.",
+   "astronomy astronomy astronomy",
+   "Let me tell you about astronomy.",
+   "This passage concerns astronomy."
+  ]
+ },
+ {
+  "name": "economics",
+  "aliases": [
+   "economy",
+   "markets",
+   "inflation"
+  ],
+  "prompts": [
+   "economics",
+   "Economics",
+   "I am thinking about economics.",
+   "The subject of this sentence is economics.",
+   "Here is a short description of economics.",
+   "economics economics economics",
+   "Let me tell you about economics.",
+   "This passage concerns economics."
+  ]
+ },
+ {
+  "name": "democracy",
+  "aliases": [
+   "voting",
+   "elections",
+   "democratic"
+  ],
+  "prompts": [
+   "democracy",
+   "Democracy",
+   "I am thinking about democracy.",
+   "The subject of this sentence is democracy.",
+   "Here is a short description of democracy.",
+   "democracy democracy democracy",
+   "Let me tell you about democracy.",
+   "This passage concerns democracy."
+  ]
+ },
+ {
+  "name": "war",
+  "aliases": [
+   "battle",
+   "combat",
+   "conflict"
+  ],
+  "prompts": [
+   "war",
+   "War",
+   "I am thinking about war.",
+   "The subject of this sentence is war.",
+   "Here is a short description of war.",
+   "war war war",
+   "Let me tell you about war.",
+   "This passage concerns war."
+  ]
+ },
+ {
+  "name": "freedom",
+  "aliases": [
+   "liberty",
+   "independence"
+  ],
+  "prompts": [
+   "freedom",
+   "Freedom",
+   "I am thinking about freedom.",
+   "The subject of this sentence is freedom.",
+   "Here is a short description of freedom.",
+   "freedom freedom freedom",
+   "Let me tell you about freedom.",
+   "This passage concerns freedom."
+  ]
+ },
+ {
+  "name": "justice",
+  "aliases": [
+   "fairness",
+   "equity"
+  ],
+  "prompts": [
+   "justice",
+   "Justice",
+   "I am thinking about justice.",
+   "The subject of this sentence is justice.",
+   "Here is a short description of justice.",
+   "justice justice justice",
+   "Let me tell you about justice.",
+   "This passage concerns justice."
+  ]
+ },
+ {
+  "name": "betrayal",
+  "aliases": [
+   "treachery",
+   "backstabbing"
+  ],
+  "prompts": [
+   "betrayal",
+   "Betrayal",
+   "I am thinking about betrayal.",
+   "The subject of this sentence is betrayal.",
+   "Here is a short description of betrayal.",
+   "betrayal betrayal betrayal",
+   "Let me tell you about betrayal.",
+   "This passage concerns betrayal."
+  ]
+ },
+ {
+  "name": "grief",
+  "aliases": [
+   "mourning",
+   "bereavement",
+   "loss"
+  ],
+  "prompts": [
+   "grief",
+   "Grief",
+   "I am thinking about grief.",
+   "The subject of this sentence is grief.",
+   "Here is a short description of grief.",
+   "grief grief grief",
+   "Let me tell you about grief.",
+   "This passage concerns grief."
+  ]
+ },
+ {
+  "name": "joy",
+  "aliases": [
+   "happiness",
+   "delight",
+   "elation"
+  ],
+  "prompts": [
+   "joy",
+   "Joy",
+   "I am thinking about joy.",
+   "The subject of this sentence is joy.",
+   "Here is a short description of joy.",
+   "joy joy joy",
+   "Let me tell you about joy.",
+   "This passage concerns joy."
+  ]
+ },
+ {
+  "name": "fear",
+  "aliases": [
+   "terror",
+   "dread",
+   "afraid"
+  ],
+  "prompts": [
+   "fear",
+   "Fear",
+   "I am thinking about fear.",
+   "The subject of this sentence is fear.",
+   "Here is a short description of fear.",
+   "fear fear fear",
+   "Let me tell you about fear.",
+   "This passage concerns fear."
+  ]
+ },
+ {
+  "name": "anger",
+  "aliases": [
+   "rage",
+   "fury"
+  ],
+  "prompts": [
+   "anger",
+   "Anger",
+   "I am thinking about anger.",
+   "The subject of this sentence is anger.",
+   "Here is a short description of anger.",
+   "anger anger anger",
+   "Let me tell you about anger.",
+   "This passage concerns anger."
+  ]
+ },
+ {
+  "name": "loneliness",
+  "aliases": [
+   "solitude",
+   "isolation",
+   "lonely"
+  ],
+  "prompts": [
+   "loneliness",
+   "Loneliness",
+   "I am thinking about loneliness.",
+   "The subject of this sentence is loneliness.",
+   "Here is a short description of loneliness.",
+   "loneliness loneliness loneliness",
+   "Let me tell you about loneliness.",
+   "This passage concerns loneliness."
+  ]
+ },
+ {
+  "name": "nostalgia",
+  "aliases": [
+   "reminiscence",
+   "longing for the past"
+  ],
+  "prompts": [
+   "nostalgia",
+   "Nostalgia",
+   "I am thinking about nostalgia.",
+   "The subject of this sentence is nostalgia.",
+   "Here is a short description of nostalgia.",
+   "nostalgia nostalgia nostalgia",
+   "Let me tell you about nostalgia.",
+   "This passage concerns nostalgia."
+  ]
+ },
+ {
+  "name": "curiosity",
+  "aliases": [
+   "inquisitiveness",
+   "wonder"
+  ],
+  "prompts": [
+   "curiosity",
+   "Curiosity",
+   "I am thinking about curiosity.",
+   "The subject of this sentence is curiosity.",
+   "Here is a short description of curiosity.",
+   "curiosity curiosity curiosity",
+   "Let me tell you about curiosity.",
+   "This passage concerns curiosity."
+  ]
+ },
+ {
+  "name": "silence",
+  "aliases": [
+   "quiet",
+   "stillness"
+  ],
+  "prompts": [
+   "silence",
+   "Silence",
+   "I am thinking about silence.",
+   "The subject of this sentence is silence.",
+   "Here is a short description of silence.",
+   "silence silence silence",
+   "Let me tell you about silence.",
+   "This passage concerns silence."
+  ]
+ },
+ {
+  "name": "darkness",
+  "aliases": [
+   "dark",
+   "night",
+   "blackness"
+  ],
+  "prompts": [
+   "darkness",
+   "Darkness",
+   "I am thinking about darkness.",
+   "The subject of this sentence is darkness.",
+   "Here is a short description of darkness.",
+   "darkness darkness darkness",
+   "Let me tell you about darkness.",
+   "This passage concerns darkness."
+  ]
+ },
+ {
+  "name": "gold",
+  "aliases": [
+   "golden",
+   "bullion",
+   "precious metal"
+  ],
+  "prompts": [
+   "gold",
+   "Gold",
+   "I am thinking about gold.",
+   "The subject of this sentence is gold.",
+   "Here is a short description of gold.",
+   "gold gold gold",
+   "Let me tell you about gold.",
+   "This passage concerns gold."
+  ]
+ },
+ {
+  "name": "blood",
+  "aliases": [
+   "bleeding",
+   "haemorrhage",
+   "hemorrhage"
+  ],
+  "prompts": [
+   "blood",
+   "Blood",
+   "I am thinking about blood.",
+   "The subject of this sentence is blood.",
+   "Here is a short description of blood.",
+   "blood blood blood",
+   "Let me tell you about blood.",
+   "This passage concerns blood."
+  ]
+ },
+ {
+  "name": "clock",
+  "aliases": [
+   "time",
+   "watch",
+   "timepiece"
+  ],
+  "prompts": [
+   "clock",
+   "Clock",
+   "I am thinking about clock.",
+   "The subject of this sentence is clock.",
+   "Here is a short description of clock.",
+   "clock clock clock",
+   "Let me tell you about clock.",
+   "This passage concerns clock."
+  ]
+ },
+ {
+  "name": "mirror",
+  "aliases": [
+   "reflection",
+   "looking glass"
+  ],
+  "prompts": [
+   "mirror",
+   "Mirror",
+   "I am thinking about mirror.",
+   "The subject of this sentence is mirror.",
+   "Here is a short description of mirror.",
+   "mirror mirror mirror",
+   "Let me tell you about mirror.",
+   "This passage concerns mirror."
+  ]
+ },
+ {
+  "name": "labyrinth",
+  "aliases": [
+   "maze",
+   "labyrinths"
+  ],
+  "prompts": [
+   "labyrinth",
+   "Labyrinth",
+   "I am thinking about labyrinth.",
+   "The subject of this sentence is labyrinth.",
+   "Here is a short description of labyrinth.",
+   "labyrinth labyrinth labyrinth",
+   "Let me tell you about labyrinth.",
+   "This passage concerns labyrinth."
+  ]
+ },
+ {
+  "name": "dream",
+  "aliases": [
+   "dreaming",
+   "dreams",
+   "sleep"
+  ],
+  "prompts": [
+   "dream",
+   "Dream",
+   "I am thinking about dream.",
+   "The subject of this sentence is dream.",
+   "Here is a short description of dream.",
+   "dream dream dream",
+   "Let me tell you about dream.",
+   "This passage concerns dream."
+  ]
+ }
+]

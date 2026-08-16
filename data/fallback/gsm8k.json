@@ -1,0 +1,22 @@
+[
+ {
+  "question": "Tom has 3 boxes with 12 pencils each. He gives away 10 pencils. How many are left?",
+  "answer": "26"
+ },
+ {
+  "question": "A shirt costs $25. It is discounted by 20%. What is the new price in dollars?",
+  "answer": "20"
+ },
+ {
+  "question": "Sara reads 15 pages a day for 6 days. How many pages has she read?",
+  "answer": "90"
+ },
+ {
+  "question": "A train travels 60 km in 45 minutes. How many km does it travel in 3 hours?",
+  "answer": "240"
+ },
+ {
+  "question": "There are 48 cookies split evenly among 8 children. How many does each child get?",
+  "answer": "6"
+ }
+]
