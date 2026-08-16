@@ -129,8 +129,8 @@ all three on a common dose-response axis.**
 
 ## 3. Methods
 
-All code is in `src/alignment_tax/`; the four Colab notebooks in `notebooks/` are thin
-wrappers over `pipeline.py`. Every generation is written to JSONL with an fsync and keyed
+All code is in `src/alignment_tax/`; the single Colab notebook in `notebooks/` is a thin
+wrapper over `pipeline.py`. Every generation is written to JSONL with an fsync and keyed
 by `(λ, condition, concept, trial, variant)`, so a killed session resumes exactly where it
 stopped.
 
