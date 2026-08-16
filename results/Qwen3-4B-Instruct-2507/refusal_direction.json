@@ -1,0 +1,870 @@
+{
+  "layer": 4,
+  "position": -3,
+  "selected": {
+    "layer": 4,
+    "position": -3,
+    "bypass_score": 0.0,
+    "induce_score": 0.03125,
+    "kl": 0.04220135882496834,
+    "passes": true,
+    "reason": ""
+  },
+  "candidates": [
+    {
+      "layer": 0,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 0,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 0,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 0,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 0,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 2,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.802166759967804,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 2,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.018602030351758003,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 2,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.08832994848489761,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 2,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.5231724381446838,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 2,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.03785508871078491,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 4,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.022531647235155106,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 4,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.032326724380254745,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 4,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.03125,
+      "kl": 0.04220135882496834,
+      "passes": true,
+      "reason": ""
+    },
+    {
+      "layer": 4,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.2869728207588196,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 4,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.12819278240203857,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 6,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.2033734917640686,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 6,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.09375,
+      "kl": 0.039637304842472076,
+      "passes": true,
+      "reason": ""
+    },
+    {
+      "layer": 6,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.1916634440422058,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 6,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.6439100503921509,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 6,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.5166466236114502,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 8,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.934827983379364,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 8,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.0975731611251831,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 8,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.11693137139081955,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 8,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.507431149482727,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 8,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.12995874881744385,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 10,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.4952303469181061,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 10,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.017966140061616898,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 10,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.2258184403181076,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 10,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.2675739824771881,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 10,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.21374493837356567,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 12,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.5345384478569031,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 12,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.7421211004257202,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 12,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.36644870042800903,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 12,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.35142314434051514,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 12,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.07366424053907394,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 14,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 2.0104029178619385,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 14,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 1.5832483768463135,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 14,
+      "position": -3,
+      "bypass_score": 0.5,
+      "induce_score": 0.0,
+      "kl": 0.02849397622048855,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 14,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.32834696769714355,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 14,
+      "position": -5,
+      "bypass_score": 0.125,
+      "induce_score": 0.0,
+      "kl": 0.061643753200769424,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 16,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 3.178107261657715,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 16,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 2.093346118927002,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 16,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.10751893371343613,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 16,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 1.3095239400863647,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 16,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.1628161072731018,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 18,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.2698419392108917,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 18,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.18471193313598633,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 18,
+      "position": -3,
+      "bypass_score": 0.875,
+      "induce_score": 0.0,
+      "kl": 0.08110828697681427,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 18,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.4203327000141144,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 18,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.9193183183670044,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 20,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.18171727657318115,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 20,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.7110565304756165,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 20,
+      "position": -3,
+      "bypass_score": 0.4375,
+      "induce_score": 0.0,
+      "kl": 0.04837177321314812,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 20,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.16734640300273895,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 20,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.10676240175962448,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 22,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.7923076748847961,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 22,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.8122475743293762,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 22,
+      "position": -3,
+      "bypass_score": 0.3125,
+      "induce_score": 0.0,
+      "kl": 0.018049970269203186,
+      "passes": false,
+      "reason": "induce<=0"
+    },
+    {
+      "layer": 22,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.22532062232494354,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 22,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.7783445715904236,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 24,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 1.4978704452514648,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 24,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 3.6147990226745605,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 24,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.2368459701538086,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 24,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.4177076518535614,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 24,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 4.460210800170898,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 26,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 1.6786834001541138,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 26,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 2.5564987659454346,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 26,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.41056621074676514,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 26,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 0.42823904752731323,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 26,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": 1.5703654289245605,
+      "passes": false,
+      "reason": "kl>=max"
+    },
+    {
+      "layer": 28,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 28,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 28,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 28,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 28,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 30,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 30,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 30,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 30,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 30,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 32,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 32,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 32,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 32,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 32,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 34,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 34,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 34,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 34,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 34,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 36,
+      "position": -1,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 36,
+      "position": -2,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 36,
+      "position": -3,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 36,
+      "position": -4,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    },
+    {
+      "layer": 36,
+      "position": -5,
+      "bypass_score": 0.0,
+      "induce_score": 0.0,
+      "kl": Infinity,
+      "passes": false,
+      "reason": "layer >= 0.8L"
+    }
+  ]
+}
