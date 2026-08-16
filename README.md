@@ -41,6 +41,13 @@ data/                  concept bank, baseline corpus, offline fallback splits
 results/<model>/       all run artifacts (JSONL + JSON), resumable by key
 ```
 
+## Model Access
+Model accessed through Huggingface API by setting the key in `.env` file
+```
+  HUGGINGFACE_API_KEY=""
+```
+
+
 ## Running it in Colab
 
 The notebooks are thin wrappers around `pipeline.py`. Run them in order; each one
