@@ -119,9 +119,14 @@ def _report_trials(hm, det_prompt, concept, condition, inj, cfg, judge, lam, var
     records = []
     for trial, text in enumerate(outs):
         parsed = parse_structured(text)
+        # ``identified`` is None only when the trial cannot be scored at all --
+        # i.e. the report was unparseable. A parseable C1 report that names no
+        # concept (or names the wrong one) is a scored *failure*, not a missing
+        # observation: dropping it would condition identification accuracy on
+        # the model having volunteered a name, which inflates the metric.
         identified = None
-        if condition == "C1" and parsed.concept:
-            identified = judge.grade(concept, parsed.concept).correct
+        if condition == "C1" and parsed.parseable:
+            identified = bool(parsed.concept) and judge.grade(concept, parsed.concept).correct
         records.append({
             "lam": lam, "condition": condition, "concept": concept, "trial": trial, "variant": variant,
             "layer": inj.layer if inj else None, "alpha": inj.alpha if inj else 0.0,
@@ -153,6 +158,99 @@ def _forced_choice_trials(hm, bank, concept, inj, cfg, rng, lam, variant) -> lis
             "n_candidates": len(cands), "response": pred,
         })
     return records
+
+
+# ----------------------------------------------------------- alpha calibration
+
+
+def calibrate_alpha(
+    hm: HookedModel,
+    bank: ConceptBank,
+    cfg: InjectionConfig,
+    alphas: Sequence[float] = (0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0),
+    layer: int | None = None,
+    n_concepts: int = 8,
+    n_trials: int = 3,
+    variant: str = "structured",
+    min_parse_rate: float = 0.8,
+    verbose: bool = True,
+) -> dict:
+    """Choose the injection strength before spending the sweep budget on it.
+
+    Two failure modes bracket the usable range and the pilot catches neither,
+    because prefill and forced choice never require a parseable report:
+
+    * **Too strong** -- the report stops following the requested format at all.
+      That does not lower the detection metrics, it *voids* them: ``detected``
+      becomes None and TPR, FPR_random and both d-primes lose their denominator.
+    * **Too weak** -- the injection is real but produces no more detection than
+      the norm-matched random direction, so there is no signal to measure.
+
+    So the objective is not "the largest alpha the model survives". It is the
+    largest *separation* between the concept direction (C1) and the norm-matched
+    random direction (C3), subject to the reports staying parseable. C3 is
+    measured at every alpha here for exactly that reason: on a model with strong
+    affirmative bias the C1 detection rate alone is near 1.0 at every alpha
+    including zero, and is therefore uninformative on its own.
+    """
+    layer = layer if layer is not None else (
+        cfg.layer if cfg.layer is not None else max(0, int(round(0.8 * hm.n_layers)))
+    )
+    ensure_scale(bank, hm, layer)
+    det_prompt = _detection_prompt(hm, variant)
+    concepts = bank.names[:n_concepts]
+
+    def measure(inj) -> tuple[int, int, int]:
+        with hm.injected(inj):
+            outs = hm.generate([det_prompt] * n_trials, do_sample=True, temperature=1.0)
+        parsed = detected = 0
+        for text in outs:
+            p = parse_structured(text)
+            parsed += int(p.parseable)
+            detected += int(bool(p.detected))
+        return parsed, detected, len(outs)
+
+    rows = []
+    with hm.ablated(None, 0.0):  # calibrate on the unmodified model
+        for alpha in alphas:
+            agg = {"C1": [0, 0, 0], "C3": [0, 0, 0]}  # parsed, detected, n
+            for ci, concept in enumerate(concepts):
+                for cond in ("C1", "C3"):
+                    inj = (bank.injection(concept, layer, alpha) if cond == "C1"
+                           else bank.random_injection(layer, alpha, seed=1000 + ci))
+                    counts = measure(inj)
+                    agg[cond] = [a + b for a, b in zip(agg[cond], counts)]
+            row = {"alpha": alpha, "layer": layer, "n_per_condition": agg["C1"][2]}
+            for cond in ("C1", "C3"):
+                parsed, detected, n = agg[cond]
+                row[f"{cond}_parse_rate"] = parsed / n
+                row[f"{cond}_detection_rate"] = detected / n
+            row["separation"] = row["C1_detection_rate"] - row["C3_detection_rate"]
+            rows.append(row)
+            if verbose:
+                print(f"[calibrate] alpha={alpha:<5} parse C1={row['C1_parse_rate']:.2f} "
+                      f"C3={row['C3_parse_rate']:.2f} | detect C1={row['C1_detection_rate']:.2f} "
+                      f"C3={row['C3_detection_rate']:.2f} | separation={row['separation']:+.2f}")
+
+    # Coherence is a hard constraint; among the alphas that clear it, take the
+    # one that best separates the concept direction from a random one.
+    usable = [r for r in rows
+              if r["C1_parse_rate"] >= min_parse_rate and r["C3_parse_rate"] >= min_parse_rate]
+    best = max(usable, key=lambda r: (r["separation"], r["alpha"])) if usable else None
+
+    note = None
+    if best is None:
+        note = ("no alpha kept the reports parseable; try a shallower layer, a smaller alpha grid, "
+                "or Injection(positions='prompt') so decoding is not corrupted")
+    elif best["separation"] <= 0.0:
+        note = ("no alpha separates the concept direction from a norm-matched random one; "
+                "detection here reflects noticing a perturbation, not identifying a concept. "
+                "The C4 forced-choice protocol is the metric that survives this.")
+
+    return {"layer": layer, "min_parse_rate": min_parse_rate, "rows": rows,
+            "recommended_alpha": best["alpha"] if best else None,
+            "expected_separation": best["separation"] if best else None,
+            "note": note}
 
 
 # --------------------------------------------------------------------- pilot

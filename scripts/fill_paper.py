@@ -12,6 +12,7 @@ unfinished results section cannot be mistaken for a finished one.
 from __future__ import annotations
 
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -32,7 +33,9 @@ def flatten(analysis: dict) -> dict[str, str]:
         if v is None:
             return None
         if isinstance(v, float):
-            return f"{v:.{digits}f}"
+            # NaN marks a metric the run could not define; leave the placeholder
+            # unfilled so it surfaces as [[MISSING: ...]] rather than "nan".
+            return f"{v:.{digits}f}" if math.isfinite(v) else None
         return str(v)
 
     for row in analysis.get("rows", []):
@@ -47,7 +50,9 @@ def flatten(analysis: dict) -> dict[str, str]:
     for lam, metrics in analysis.get("summary", {}).items():
         lam_s = f"{float(lam):g}"
         for k, est in metrics.items():
-            out[f"{k}_ci@{lam_s}"] = f"[{est['lo']:.3f}, {est['hi']:.3f}]"
+            # An empty bootstrap yields NaN bounds; leave those unfilled too.
+            if math.isfinite(est["lo"]) and math.isfinite(est["hi"]):
+                out[f"{k}_ci@{lam_s}"] = f"[{est['lo']:.3f}, {est['hi']:.3f}]"
 
     for k, v in (analysis.get("exchange_rate") or {}).items():
         if isinstance(v, (int, float)):

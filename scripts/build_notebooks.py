@@ -56,16 +56,54 @@ md("## 0 · Environment")
 
 code(
     '''
-# Colab: paste a GitHub PAT with repo:read scope. It is used only for the clone
-# and is not written to disk.
+# Tokens come from Colab secrets (key icon in the left sidebar): add GITHUB_TOKEN
+# (repo:read, only needed while the repo is private) and HF_TOKEN (read, needed
+# for gated models), and toggle "Notebook access" on for both. Outside Colab we
+# fall back to the environment, then to an interactive prompt. Neither token is
+# written to disk.
 import os, subprocess, sys, getpass, pathlib
 
 REPO   = "sagnikc395/apart-mind-digital-mind"  #@param {type:"string"}
 BRANCH = "main"                                 #@param {type:"string"}
 WORKDIR = "/content"
 
+try:
+    from google.colab import userdata as _colab_secrets
+except Exception:
+    _colab_secrets = None
+
+
+def get_secret(name: str, prompt: str) -> str:
+    """Colab secret -> environment -> interactive prompt. Blank means 'skip'."""
+    if _colab_secrets is not None:
+        try:
+            value = _colab_secrets.get(name)
+        except Exception as exc:            # not set, or notebook access is off
+            print(f"{name}: no Colab secret ({type(exc).__name__})")
+        else:
+            if value:
+                os.environ[name] = value
+                print(f"{name}: from Colab secrets")
+                return value
+    value = os.environ.get(name)
+    if value:
+        print(f"{name}: from environment")
+        return value
+    value = getpass.getpass(prompt).strip()
+    if value:
+        os.environ[name] = value
+    return value
+
+
+GITHUB_TOKEN = get_secret("GITHUB_TOKEN", "GitHub token (blank if public): ")
+HF_TOKEN = get_secret("HF_TOKEN", "Hugging Face token (blank if not gated): ")
+if HF_TOKEN:
+    # the two names transformers/huggingface_hub actually read
+    os.environ["HUGGING_FACE_HUB_TOKEN"] = HF_TOKEN
+    os.environ["HF_TOKEN"] = HF_TOKEN
+
 if pathlib.Path("/content").exists():
-    token = os.environ.get("GITHUB_TOKEN") or getpass.getpass("GitHub token (blank if public): ")
+    token = GITHUB_TOKEN
     url = f"https://{token}@github.com/{REPO}.git" if token else f"https://github.com/{REPO}.git"
     dest = pathlib.Path(WORKDIR) / REPO.split("/")[-1]
     if dest.exists():
@@ -81,6 +119,13 @@ else:
 REPO_ROOT = pathlib.Path.cwd()
 sys.path.insert(0, str(REPO_ROOT / "src"))
 print("cwd:", os.getcwd())
+
+if HF_TOKEN:
+    try:
+        from huggingface_hub import HfApi
+        print("hugging face:", HfApi().whoami(token=HF_TOKEN)["name"])
+    except Exception as exc:
+        print("hugging face token present but whoami failed:", exc)
 ''',
     'Clone the repo and install dependencies { display-mode: "form" }',
 )

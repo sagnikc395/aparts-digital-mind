@@ -51,9 +51,20 @@ Model accessed through Huggingface API by setting the key in `.env` file
 ## Running it in Colab
 
 `notebooks/alignment_tax_full_run.ipynb` is the whole experiment in one notebook,
-a thin wrapper around `pipeline.py`. It clones this repo (GitHub PAT prompt, or set
-`GITHUB_TOKEN`), installs deps, and mounts Drive so results survive a session kill.
-Run it top to bottom:
+a thin wrapper around `pipeline.py`. It clones this repo, installs deps, and mounts
+Drive so results survive a session kill.
+
+Before running, add two **Colab secrets** (key icon in the left sidebar) with
+*Notebook access* on:
+
+| Secret | Scope | Needed for |
+| --- | --- | --- |
+| `GITHUB_TOKEN` | `repo:read` | cloning while this repo is private |
+| `HF_TOKEN` | read | downloading gated Hugging Face models |
+
+Cell 0 reads each secret, falls back to the environment variable of the same name,
+and only then prompts interactively; a blank answer skips it. Neither token is
+written to disk. Run the notebook top to bottom:
 
 0. **Environment** — clone, deps, results directory, bundled data files, config.
 1. **Refusal direction** — checkpointed to `refusal_direction.pt`.

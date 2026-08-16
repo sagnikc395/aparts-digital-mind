@@ -132,6 +132,100 @@ def test_summarise() -> None:
     check("z is the inverse normal cdf", abs(z(0.5)) < 1e-9 and abs(z(0.975) - 1.96) < 0.01)
 
 
+def test_metric_keys_cover_metrics() -> None:
+    """METRIC_KEYS must list everything ``_metrics_from`` can emit.
+
+    If a metric is added there and not here, ``summary_table`` stops padding it
+    and the column silently vanishes from the tidy table whenever the metric is
+    undefined -- which is the failure that produced a bare KeyError downstream
+    instead of a NaN cell.
+    """
+    from alignment_tax.stats import METRIC_KEYS, _metrics_from, concept_counts
+
+    counts = concept_counts(synthetic_records())
+    produced = set()
+    for (lam, _c), cells in counts.items():
+        produced |= set(_metrics_from({k: [v] for k, v in cells.items()}))
+    missing = produced - set(METRIC_KEYS)
+    check("METRIC_KEYS covers every metric _metrics_from emits", not missing, str(missing))
+
+
+def test_undefined_metrics_survive_the_stack() -> None:
+    """A sweep where every injected report is unparseable must still produce a
+    full-width table, NaN cells, and a diagnostic -- not a missing column."""
+    import math
+
+    from alignment_tax.analysis import parse_diagnostics
+    from alignment_tax.stats import METRIC_KEYS, summarise, summary_table
+
+    recs = []
+    for lam in (0.0, 1.0):
+        for concept in [f"concept{i}" for i in range(6)]:
+            for trial in range(4):
+                # C1/C3 unparseable (the alpha-too-high signature), C2 fine.
+                for cond in ("C1", "C3"):
+                    recs.append({"lam": lam, "condition": cond, "concept": concept,
+                                 "trial": trial, "variant": "structured", "detected": None,
+                                 "parseable": False, "identified": None, "n_words": 12})
+                recs.append({"lam": lam, "condition": "C2", "concept": concept, "trial": trial,
+                             "variant": "structured", "detected": True, "parseable": True,
+                             "identified": None, "n_words": 6})
+
+    rows = summary_table(summarise(recs, n_boot=50, seed=0))
+    check("undefined metrics: table keeps full width",
+          all(set(METRIC_KEYS) <= set(r) for r in rows))
+    check("undefined metrics: tpr is NaN, not absent",
+          all("tpr" in r and math.isnan(r["tpr"]) for r in rows))
+    check("undefined metrics: a defined metric is still a real number",
+          all(r["fpr_clean"] == 1.0 for r in rows))
+
+    diag = parse_diagnostics(recs, "structured")
+    check("undefined metrics: diagnostics flag the parse failure",
+          diag["min_injected_parse_rate"] == 0.0 and diag["warnings"])
+
+    # The three consumers that used to test `is None` and would now let NaN pass.
+    from alignment_tax.figures import _series
+    check("figures: NaN series is dropped, not plotted", _series(rows, "tpr") == ([], [], [], []))
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    from fill_paper import flatten
+    flat = flatten({"rows": rows, "summary": {}, "exchange_rate": {}})
+    check("paper: NaN metrics stay unfilled rather than typeset as 'nan'",
+          not any(k.startswith("tpr@") for k in flat) and "nan" not in set(flat.values()))
+
+
+def test_identification_counts_unnamed_as_failure() -> None:
+    """A parseable C1 report that names no concept is a miss, not a missing
+    observation. Scoring it as None inflates identification accuracy."""
+    from alignment_tax.introspection import _report_trials
+
+    import contextlib
+
+    class _Stub:
+        def __init__(self, texts): self.texts = texts
+        def generate(self, prompts, **kw): return self.texts
+        @contextlib.contextmanager
+        def injected(self, inj): yield
+
+    class _Cfg:
+        n_trials = 3
+
+    judge = LexicalJudge({"ocean": []})
+    texts = ["Detection: Yes\nConcept: ocean",     # hit
+             "Detection: Yes\nConcept: None",      # detected but unnamed -> miss
+             "Detection: No\nConcept: None"]       # no detection -> miss
+    recs = _report_trials(_Stub(texts), "p", "ocean", "C1", None, _Cfg(), judge,
+                          0.0, "structured", 1.0)
+    ident = [r["identified"] for r in recs]
+    check("identification: unnamed parseable report scores False, not None",
+          ident == [True, False, False], str(ident))
+
+    unparse = _report_trials(_Stub(["~~~ garbled ~~~"]), "p", "ocean", "C1", None, _Cfg(),
+                             judge, 0.0, "structured", 1.0)
+    check("identification: unparseable report stays unscored (None)",
+          unparse[0]["identified"] is None)
+
+
 def test_end_to_end_analysis(specific: bool = False) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
@@ -219,6 +313,10 @@ if __name__ == "__main__":
         ("test_judge", test_judge),
         ("test_two_proportion_and_holm", test_two_proportion_and_holm),
         ("test_summarise", test_summarise),
+        ("test_metric_keys_cover_metrics", test_metric_keys_cover_metrics),
+        ("test_undefined_metrics_survive_the_stack", test_undefined_metrics_survive_the_stack),
+        ("test_identification_counts_unnamed_as_failure",
+         test_identification_counts_unnamed_as_failure),
         ("test_end_to_end_analysis[non-specific]", test_end_to_end_analysis),
         ("test_end_to_end_analysis[specific]", lambda: test_end_to_end_analysis(specific=True)),
         ("test_resumability", test_resumability),

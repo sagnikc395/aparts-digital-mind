@@ -19,7 +19,7 @@ from .capability import run_capability_sweep
 from .concepts import ConceptBank, build_concept_bank, dump_bank_summary, resolve_layers
 from .config import RunConfig
 from .directions import RefusalDirection, extract_refusal_direction
-from .introspection import run_pilot, run_sweep
+from .introspection import calibrate_alpha, run_pilot, run_sweep
 from .judge import make_judge
 from .model import HookedModel
 from .safety import LlamaGuardJudge, run_safety_sweep
@@ -64,6 +64,55 @@ def stage_concepts(hm: HookedModel, cfg: RunConfig, force: bool = False) -> Conc
     bank.save(path)
     dump_bank_summary(bank, layers[len(layers) // 2], cfg.artifact("concept_bank_summary.json"))
     return bank
+
+
+def stage_calibrate(hm: HookedModel, cfg: RunConfig, bank: ConceptBank,
+                    alphas=(0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0), apply: bool = True,
+                    force: bool = False) -> dict:
+    """Fix the injection strength before spending the sweep budget.
+
+    With ``apply=True`` the recommended alpha is written back into
+    ``cfg.injection.alpha``. Note that alpha is *not* part of the sweep's resume
+    key, so changing it invalidates any existing ``sweep_*.jsonl``: the stage
+    renames a stale sweep out of the way rather than letting the resume logic
+    silently reuse rows measured at the old strength.
+    """
+    path = cfg.artifact("alpha_calibration.json")
+    if path.exists() and not force:
+        report = json.loads(path.read_text())
+    else:
+        report = calibrate_alpha(hm, bank, cfg.injection, alphas=alphas)
+        path.write_text(json.dumps(report, indent=2))
+    if report.get("note"):
+        print(f"[calibrate] WARNING: {report['note']}")
+    rec = report.get("recommended_alpha")
+    if rec is not None and apply and rec != cfg.injection.alpha:
+        print(f"[calibrate] alpha {cfg.injection.alpha} -> {rec}")
+        _invalidate_sweeps(cfg, f"alpha {cfg.injection.alpha} -> {rec}")
+        cfg.injection.alpha = rec
+        cfg.save()
+    return report
+
+
+def _invalidate_sweeps(cfg: RunConfig, reason: str) -> list[Path]:
+    """Move existing sweep artifacts aside.
+
+    ``KEY_FIELDS`` in ``introspection`` is (lam, condition, concept, trial,
+    variant) -- alpha is deliberately not in it, so a re-run after recalibration
+    would skip every existing row and silently keep results measured at the old
+    injection strength. Renaming rather than deleting keeps the old data around.
+    """
+    moved = []
+    for p in sorted(cfg.run_dir.glob("sweep_*.jsonl")):
+        dest = p.with_suffix(p.suffix + ".stale")
+        i = 1
+        while dest.exists():
+            i += 1
+            dest = p.with_suffix(f"{p.suffix}.stale{i}")
+        p.rename(dest)
+        moved.append(dest)
+        print(f"[calibrate] {reason}: moved {p.name} -> {dest.name} (must be re-run)")
+    return moved
 
 
 def stage_pilot(hm: HookedModel, cfg: RunConfig, bank: ConceptBank, direction: torch.Tensor | None,
@@ -171,12 +220,14 @@ def stage_figures(cfg: RunConfig, variant: str = "structured", fig_dir: Path | N
 
 
 def run_all(cfg: RunConfig, skip_pilot: bool = False, use_guard: bool = False,
-            use_llm_judge: bool = False) -> dict:
+            use_llm_judge: bool = False, skip_calibration: bool = False) -> dict:
     """The whole pipeline, in the order of the timeline in section 6."""
     cfg.save()
     hm = load_model(cfg)
     rd = stage_direction(hm, cfg)
     bank = stage_concepts(hm, cfg)
+    if not skip_calibration:
+        stage_calibrate(hm, cfg, bank)
     if not skip_pilot:
         stage_pilot(hm, cfg, bank, rd.vector)
     stage_sweep(hm, cfg, bank, rd.vector, use_llm_judge=use_llm_judge)

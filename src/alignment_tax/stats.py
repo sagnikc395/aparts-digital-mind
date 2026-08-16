@@ -33,6 +33,27 @@ from .io_utils import read_jsonl
 _ND = NormalDist()
 N_BOOT = 10_000
 
+#: Every metric ``_metrics_from`` can produce. A metric is absent from a summary
+#: when its denominator was empty (e.g. no parseable C1 report at all), and the
+#: tidy table must still carry the column -- as NaN -- so that downstream code
+#: sees "undefined here" rather than a missing key.
+METRIC_KEYS = (
+    "tpr", "fpr_clean", "fpr_random", "identification", "conditional_identification",
+    "joint", "forced_choice", "forced_choice_chance", "d_clean", "d_random",
+    "specificity_index", "parse_rate", "mean_words",
+)
+
+
+def is_num(v) -> bool:
+    """True for a usable numeric value. NaN is *not* usable.
+
+    Every consumer of the tidy table (figures, the paper filler, the frontier)
+    must agree on this test: ``summary_table`` pads undefined metrics with NaN,
+    and a bare ``v is not None`` check would let those through and silently plot
+    or typeset them.
+    """
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+
 
 def z(p: float) -> float:
     return _ND.inv_cdf(min(max(p, 1e-6), 1 - 1e-6))
@@ -231,9 +252,18 @@ def binomial_vs_chance(k: int, n: int, chance: float) -> dict:
 
 
 def summary_table(summary: dict[float, dict[str, Estimate]]) -> list[dict]:
+    """Tidy one row per lambda, with a fixed column set.
+
+    Undefined metrics are emitted as NaN rather than omitted: a lambda where no
+    C1 report parsed has no TPR, and that has to show up as a NaN cell instead
+    of a vanishing column.
+    """
+    nan = float("nan")
     rows = []
     for lam in sorted(summary):
         row: dict[str, object] = {"lam": lam}
+        for k in METRIC_KEYS:
+            row[k], row[f"{k}_lo"], row[f"{k}_hi"] = nan, nan, nan
         for k, est in summary[lam].items():
             row[k] = est.value
             row[f"{k}_lo"], row[f"{k}_hi"] = est.lo, est.hi

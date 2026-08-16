@@ -79,8 +79,18 @@ class InjectionConfig:
 
     #: Injection strength as a multiple of the mean residual-stream norm at the
     #: injection layer -- this normalisation is stated explicitly in the paper.
-    alpha: float = 4.0
-    alpha_pilot: tuple[float, ...] = (2.0, 4.0)
+    #:
+    #: Under *this* normalisation alpha=1 injects a vector as large as the whole
+    #: residual stream, so the usable range is well below 1 and the coherence
+    #: cliff is sharp. Measured on Qwen3-0.6B at layer 22: alpha=0.25 keeps 83%
+    #: of reports parseable, alpha=0.5 keeps 67%, and alpha>=1.0 keeps none --
+    #: at which point detection is not merely low, it is undefined.
+    #:
+    #: This default is only a starting point: the cliff moves with model and
+    #: layer, so ``pipeline.stage_calibrate`` measures it per run and overwrites
+    #: this value. Do not raise it without re-running that stage.
+    alpha: float = 0.25
+    alpha_pilot: tuple[float, ...] = (0.25, 0.5)
     #: Layer sweep expressed as fractions of depth; fixed after the pilot.
     layer_fracs: tuple[float, ...] = (0.5, 0.7, 0.85)
     layer: int | None = None  # resolved absolute layer once the pilot fixes it

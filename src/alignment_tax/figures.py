@@ -21,6 +21,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from .analysis import frontier_points  # noqa: E402
+from .stats import is_num  # noqa: E402
 
 PALETTE = {
     "detection": "#2f6f9f",
@@ -46,14 +47,19 @@ plt.rcParams.update({
 
 
 def _series(rows: list[dict], key: str):
+    """Drop lambdas where the metric is undefined.
+
+    ``summary_table`` pads undefined metrics with NaN so the column always
+    exists, so this must test for a real number rather than for ``None``.
+    """
     lams, vals, los, his = [], [], [], []
     for r in rows:
-        if r.get(key) is None:
+        if not is_num(r.get(key)):
             continue
         lams.append(r["lam"])
         vals.append(r[key])
-        los.append(r.get(f"{key}_lo", r[key]))
-        his.append(r.get(f"{key}_hi", r[key]))
+        los.append(r[f"{key}_lo"] if is_num(r.get(f"{key}_lo")) else r[key])
+        his.append(r[f"{key}_hi"] if is_num(r.get(f"{key}_hi")) else r[key])
     return lams, vals, los, his
 
 
@@ -141,12 +147,12 @@ def fig4_capability(analysis: dict, out: Path) -> Path:
         ("cap_gsm8k", "GSM8K accuracy"),
         ("cap_ce_loss", "CE loss (Alpaca)"),
     ]
-    panels = [p for p in panels if any(r.get(p[0]) is not None for r in rows)] or panels[:1]
+    panels = [p for p in panels if any(is_num(r.get(p[0])) for r in rows)] or panels[:1]
     fig, axes = plt.subplots(1, len(panels), figsize=(2.3 * len(panels) + 0.6, 2.6), sharex=True)
     axes = [axes] if len(panels) == 1 else list(axes)
     for ax, (key, label) in zip(axes, panels):
-        lams = [r["lam"] for r in rows if r.get(key) is not None]
-        vals = [r[key] for r in rows if r.get(key) is not None]
+        lams = [r["lam"] for r in rows if is_num(r.get(key))]
+        vals = [r[key] for r in rows if is_num(r.get(key))]
         ax.plot(lams, vals, "o-", color=PALETTE["detection"], lw=1.5, ms=4)
         ax.set_title(label, fontsize=8.5)
         ax.set_xlabel(r"$\lambda$")
