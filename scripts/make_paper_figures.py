@@ -233,8 +233,8 @@ fig.suptitle("Figure 3. At $\\alpha$ = 4 the model identifies the injected conce
              "chance while being unable to write a report about it.",
              x=0.005, ha="left", fontsize=10.5, color=INK)
 fig.tight_layout(rect=(0, 0, 1, 0.91))
-fig.savefig(OUT / "fig4_two_channels.png", bbox_inches="tight")
-fig.savefig(OUT / "fig4_two_channels.pdf", bbox_inches="tight")
+fig.savefig(OUT / "fig5_two_channels.png", bbox_inches="tight")
+fig.savefig(OUT / "fig5_two_channels.pdf", bbox_inches="tight")
 plt.close(fig)
 
 # ---------------------------------------------------------------- Figure 4
@@ -304,8 +304,8 @@ fig.suptitle("Figure 4. Forced-choice accuracy is explained by the geometry of t
              "bank, not by the ablation dose.",
              x=0.005, ha="left", fontsize=10.5, color=INK)
 fig.tight_layout(rect=(0, 0, 1, 0.91))
-fig.savefig(OUT / "fig5_geometry.png", bbox_inches="tight")
-fig.savefig(OUT / "fig5_geometry.pdf", bbox_inches="tight")
+fig.savefig(OUT / "fig6_geometry.png", bbox_inches="tight")
+fig.savefig(OUT / "fig6_geometry.pdf", bbox_inches="tight")
 plt.close(fig)
 
 print(f"wrote 4 figures to {OUT}")
