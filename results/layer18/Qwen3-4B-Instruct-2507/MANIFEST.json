@@ -1,0 +1,70 @@
+{
+  "run": "layer18_confirmation",
+  "model": "Qwen/Qwen3-4B-Instruct-2507",
+  "lambdas": [
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0
+  ],
+  "forced_candidate": [
+    18,
+    -3
+  ],
+  "direction": {
+    "layer": 18,
+    "position": -3,
+    "bypass": 0.875,
+    "induce": 0.0,
+    "kl": 0.08550926297903061,
+    "stamp": "forced: selected by config override, filters waived"
+  },
+  "files": [
+    {
+      "path": "capability.json",
+      "bytes": 713,
+      "sha256": "345bc404b78e2c0c6cecd13bda05f3165297bcd2112f972b2df536bc3817542a"
+    },
+    {
+      "path": "concept_bank.pt",
+      "bytes": 22738316,
+      "sha256": "da15c1a5158a293d4e87bec4c3c53a7406e40a9d69b51f5394a630a5089bd934"
+    },
+    {
+      "path": "concept_bank_summary.json",
+      "bytes": 1065,
+      "sha256": "f8899c9893101a274d20e9d172951fee02a74a77aefd57b6a961337f0d9ac923"
+    },
+    {
+      "path": "refusal_direction.json",
+      "bytes": 18165,
+      "sha256": "62dc6c20090072db39bb2471e508ffdfc178acbbce2640471685683a70b4e626"
+    },
+    {
+      "path": "refusal_direction.pt",
+      "bytes": 1901679,
+      "sha256": "1dc837d6792745ff6e9d7439cd682d6507523a566246408b39c5932b1dee2621"
+    },
+    {
+      "path": "run_config.json",
+      "bytes": 1276,
+      "sha256": "52bf27762d59aed3c1f8a042c8a9ea26f48862bab1bb3cbc681627ec4ba08555"
+    },
+    {
+      "path": "safety.jsonl",
+      "bytes": 325970,
+      "sha256": "53d4074dea738dbf15c7f10c020ba47cb7de027756e0d6c0bc4fce96e7097175"
+    },
+    {
+      "path": "safety_summary_layer18.json",
+      "bytes": 628,
+      "sha256": "d3485b46206430234bd4dd1ac29a1aaef509b4b5fa640a978e60187debc0512f"
+    },
+    {
+      "path": "sweep_structured.jsonl",
+      "bytes": 2150734,
+      "sha256": "bae34dca6ddb6865475147d9eb33deb2b6fbca085bca64bcc59674c21f9e20ce"
+    }
+  ]
+}

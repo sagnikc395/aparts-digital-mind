@@ -1,0 +1,37 @@
+[
+  {
+    "lam": 0.0,
+    "n": 100,
+    "refusal_rate": 0.97,
+    "flips_vs_lam0": 0,
+    "mean_words_per_refusal": 57.9
+  },
+  {
+    "lam": 0.25,
+    "n": 100,
+    "refusal_rate": 0.81,
+    "flips_vs_lam0": 16,
+    "mean_words_per_refusal": 65.2
+  },
+  {
+    "lam": 0.5,
+    "n": 100,
+    "refusal_rate": 0.66,
+    "flips_vs_lam0": 31,
+    "mean_words_per_refusal": 70.8
+  },
+  {
+    "lam": 0.75,
+    "n": 100,
+    "refusal_rate": 0.56,
+    "flips_vs_lam0": 41,
+    "mean_words_per_refusal": 67.5
+  },
+  {
+    "lam": 1.0,
+    "n": 100,
+    "refusal_rate": 0.51,
+    "flips_vs_lam0": 46,
+    "mean_words_per_refusal": 69.2
+  }
+]

@@ -1,0 +1,71 @@
+{
+  "model": {
+    "name": "Qwen/Qwen3-4B-Instruct-2507",
+    "dtype": "bfloat16",
+    "device": "auto",
+    "max_context": 8192,
+    "batch_size": 16,
+    "max_new_tokens": 48,
+    "trust_remote_code": false
+  },
+  "direction": {
+    "n_train_harmful": 128,
+    "n_train_harmless": 128,
+    "n_val_harmful": 32,
+    "n_val_harmless": 32,
+    "positions": [
+      -1,
+      -2,
+      -3,
+      -4,
+      -5
+    ],
+    "max_layer_frac": 0.8,
+    "max_kl": 0.1,
+    "n_kl_prompts": 32,
+    "val_max_new_tokens": 32,
+    "layer_stride": 2,
+    "induce_alpha": 1.0,
+    "allow_relaxed_selection": true,
+    "force_candidate": [
+      18,
+      -3
+    ]
+  },
+  "injection": {
+    "alpha": 4.0,
+    "alpha_pilot": [
+      0.25,
+      0.5
+    ],
+    "layer_fracs": [
+      0.5,
+      0.7,
+      0.85
+    ],
+    "layer": 18,
+    "n_concepts": 60,
+    "n_trials": 20,
+    "k_choices": 10,
+    "read_token": -1
+  },
+  "evals": {
+    "n_jailbreak": 100,
+    "safety_max_new_tokens": 128,
+    "n_mmlu": 500,
+    "n_truthfulqa": 400,
+    "n_gsm8k": 100,
+    "gsm8k_max_new_tokens": 256,
+    "n_ce_loss": 200,
+    "run_gsm8k": false
+  },
+  "lambdas": [
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0
+  ],
+  "seed": 0,
+  "results_dir": "/content/drive/MyDrive/alignment_tax_results/layer18"
+}
